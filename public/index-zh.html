@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>回声树洞 - 全球匿名记忆地图</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="map-stage" aria-label="全球匿名记忆地图">
+        <div class="topbar">
+          <div>
+            <p class="kicker">全球记忆地图</p>
+            <h1>回声树洞</h1>
+          </div>
+          <div class="top-actions" role="group" aria-label="视图操作">
+            <button class="icon-btn" id="openLang" type="button" title="语言" aria-label="语言">
+              <span aria-hidden="true">🌐</span>
+            </button>
+            <button class="icon-btn" id="openSubmit" type="button" title="投稿" aria-label="投稿">
+              <span aria-hidden="true">+</span>
+            </button>
+            <button class="icon-btn" id="openInfo" type="button" title="关于" aria-label="关于">
+              <span aria-hidden="true">i</span>
+            </button>
+            <button class="icon-btn" id="openMine" type="button" title="我的" aria-label="我的">
+              <span aria-hidden="true">≡</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="map-canvas" id="mapCanvas" aria-label="OpenStreetMap 互动地图">
+          <div id="map"></div>
+          <div class="hint-chip">点击地图选择投稿位置</div>
+        </div>
+      </section>
+
+      <aside class="panel" aria-live="polite">
+        <div class="panel-tabs" role="tablist" aria-label="内容面板">
+          <button class="tab active" data-tab="read" type="button">阅读</button>
+          <button class="tab" data-tab="submit" type="button">投稿</button>
+          <button class="tab" data-tab="mine" type="button">我的</button>
+          <button class="tab" data-tab="about" type="button">说明</button>
+        </div>
+
+        <section class="tab-panel active" id="readPanel">
+          <div class="panel-heading">
+            <p class="eyebrow">匿名回声</p>
+            <h2>把难以开口的话，放在一个地点上。</h2>
+          </div>
+          <div class="filters" id="filters"></div>
+          <div class="story-list" id="storyList"></div>
+        </section>
+
+        <section class="tab-panel" id="submitPanel">
+          <div class="panel-heading">
+            <p class="eyebrow" id="submitIdentity">游客投稿 / 即时发布</p>
+            <h2>写给某个地方，也写给此刻的自己。</h2>
+          </div>
+          <form id="submitForm" class="stack">
+            <label>
+              <span>标题</span>
+              <input name="title" maxlength="40" required placeholder="比如：凌晨的天桥" />
+            </label>
+            <label>
+              <span>内容</span>
+              <textarea name="body" maxlength="1200" required placeholder="不需要完整，不需要漂亮，真实就好。"></textarea>
+            </label>
+            <div class="field-grid">
+              <label>
+                <span>情绪</span>
+                <select name="mood">
+                  <option value="lonely">孤独</option>
+                  <option value="tender">温柔</option>
+                  <option value="calm">平静</option>
+                  <option value="confused">迷茫</option>
+                  <option value="hopeful">希望</option>
+                  <option value="anxious">焦虑</option>
+                  <option value="sad">难过</option>
+                  <option value="angry">愤怒</option>
+                  <option value="grateful">感谢</option>
+                  <option value="missing">想念</option>
+                  <option value="relieved">释然</option>
+                  <option value="tired">疲惫</option>
+                  <option value="secret">秘密</option>
+                </select>
+              </label>
+              <label>
+                <span>大区</span>
+                <select id="mainRegionSelect"></select>
+              </label>
+              <label>
+                <span>省份/地区</span>
+                <select name="province" id="provinceSelect" required></select>
+              </label>
+            </div>
+            <label>
+              <span>地点名称</span>
+              <input name="placeName" maxlength="60" required placeholder="城市、街道、学校、车站都可以" />
+            </label>
+            <div class="coords">
+              <label>
+                <span>纬度</span>
+                <input name="lat" id="latInput" inputmode="decimal" readonly required />
+              </label>
+              <label>
+                <span>经度</span>
+                <input name="lng" id="lngInput" inputmode="decimal" readonly required />
+              </label>
+            </div>
+            <p class="microcopy">投稿范围全球有效。登录后投稿可在"我的"里查看和删除，游客投稿即时发布但无法删除。</p>
+            <button class="primary-btn" type="submit">立即发布</button>
+            <p class="status-line" id="submitStatus"></p>
+          </form>
+        </section>
+
+        <section class="tab-panel" id="minePanel">
+          <div class="panel-heading">
+            <p class="eyebrow">账户</p>
+            <h2>登录后查看和管理自己的投稿。</h2>
+          </div>
+
+          <div id="authBox" class="auth-box">
+            <form id="loginForm" class="auth-form">
+              <label>
+                <span>账号</span>
+                <input name="username" autocomplete="username" placeholder="3-32 位账号" />
+              </label>
+              <label>
+                <span>密码</span>
+                <input name="password" type="password" autocomplete="current-password" placeholder="至少 6 位" />
+              </label>
+              <button class="primary-btn" type="submit">登录</button>
+            </form>
+            <form id="registerForm" class="auth-form">
+              <label>
+                <span>注册账号</span>
+                <input name="username" autocomplete="username" placeholder="3-32 位，字母、数字、下划线、短横线" />
+              </label>
+              <label>
+                <span>设置密码</span>
+                <input name="password" type="password" autocomplete="new-password" placeholder="至少 6 位" />
+              </label>
+              <button class="secondary-btn wide" type="submit">注册并登录</button>
+            </form>
+            <p class="microcopy">不登录也可以投稿，系统会把它视为游客投稿；游客投稿即时发布，但无法在个人中心管理。</p>
+            <p class="status-line" id="authStatus"></p>
+          </div>
+
+          <div id="mineBox" class="mine-box hidden">
+            <div class="account-row">
+              <div>
+                <p class="eyebrow">当前账号</p>
+                <strong id="currentUsername"></strong>
+              </div>
+              <button class="secondary-btn" id="logoutButton" type="button">退出</button>
+            </div>
+            <div class="toolbar">
+              <button class="secondary-btn active" data-my-status="all" type="button">全部</button>
+              <button class="secondary-btn" data-my-status="approved" type="button">已发布</button>
+              <button class="secondary-btn" data-my-status="rejected" type="button">未通过</button>
+            </div>
+            <div class="mine-list" id="mineList"></div>
+          </div>
+
+          <div id="adminBox" class="admin-box hidden">
+            <div class="account-row">
+              <div>
+                <p class="eyebrow">管理员面板</p>
+                <strong id="adminUsername"></strong>
+              </div>
+              <button class="secondary-btn" id="adminLogoutButton" type="button">退出</button>
+            </div>
+            <div class="toolbar">
+              <button class="secondary-btn active" data-admin-filter="all" type="button">全部</button>
+              <button class="secondary-btn" data-admin-filter="approved" type="button">已发布</button>
+              <button class="secondary-btn" data-admin-filter="pending" type="button">待审</button>
+              <button class="secondary-btn" data-admin-filter="rejected" type="button">已拒绝</button>
+            </div>
+            <div class="admin-posts-list" id="adminPostsList"></div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="aboutPanel">
+          <div class="panel-heading">
+            <p class="eyebrow">关于</p>
+            <h2>一个不要求答案的公共树洞。</h2>
+          </div>
+          <div class="about-copy">
+            <p>回声树洞面向个人情感，也允许日常片段、秘密、悔意、感谢、梦、告别和那些不好归类的话。</p>
+            <p>它不是求助热线，也不是公开审判场。我们保留最低限度的审核：保护隐私、避免人身攻击、拒绝违法或危险引导。</p>
+            <p>地点只用于让记忆有一个可以停靠的坐标。地图底图来自 OpenStreetMap，投稿范围全球有效。</p>
+            <button class="secondary-btn" id="openFeedback" type="button" style="margin-top:12px;">提交反馈</button>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <template id="storyTemplate">
+      <article class="story-card">
+        <button class="story-button" type="button">
+          <span class="story-topline"></span>
+          <strong></strong>
+          <p></p>
+        </button>
+      </article>
+    </template>
+
+    <template id="mineTemplate">
+      <article class="mine-card">
+        <div>
+          <p class="story-topline"></p>
+          <h3></h3>
+          <p class="mine-body"></p>
+          <button class="delete-btn" type="button" data-post-id="">删除</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="adminPostTemplate">
+      <article class="admin-post-card">
+        <div>
+          <p class="story-topline"></p>
+          <h3></h3>
+          <p class="post-body"></p>
+          <div class="admin-actions">
+            <button class="delete-btn" type="button" data-post-id="">删除</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <!-- 反馈模态框 -->
+    <div id="feedbackModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>提交反馈</h2>
+          <button class="modal-close" id="closeFeedback" type="button">×</button>
+        </div>
+        <form id="feedbackForm" class="stack">
+          <label>
+            <span>反馈类型</span>
+            <select name="type">
+              <option value="bug">Bug 报告</option>
+              <option value="suggestion">建议</option>
+              <option value="other">其他</option>
+            </select>
+          </label>
+          <label>
+            <span>标题 *</span>
+            <input name="title" maxlength="100" required placeholder="简短描述你的反馈" />
+          </label>
+          <label>
+            <span>内容 *</span>
+            <textarea name="content" maxlength="1000" required placeholder="详细说明..." style="min-height:80px;"></textarea>
+          </label>
+          <label>
+            <span>联系方式（可选）</span>
+            <input name="contact" maxlength="100" placeholder="邮箱或其他联系方式" />
+          </label>
+          <button class="primary-btn" type="submit">提交</button>
+          <p class="status-line" id="feedbackStatus"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/app-zh.js"></script>
+  </body>
+</html>

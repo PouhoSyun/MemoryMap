@@ -1,0 +1,73 @@
+[
+  {
+    "id": "4c365f2d-af7d-4fd5-b239-8f97ac8e1b89",
+    "title": "溯洄大石河",
+    "body": "在暴雨天前往霞云岭，赴一个重要的约",
+    "mood": "tender",
+    "placeName": "霞云岭",
+    "province": "北京市",
+    "lat": 39.72779,
+    "lng": 115.73925,
+    "userId": null,
+    "authorMode": "guest",
+    "status": "approved",
+    "createdAt": "2026-06-11T14:44:38.279Z",
+    "reviewedAt": "2026-06-11T14:44:38.279Z"
+  },
+  {
+    "id": "31aa6564-bdca-4d3c-b7a2-c0498b858641",
+    "title": "七星山的青草地",
+    "body": "我的微信头像，不知道现在什么样子了",
+    "mood": "calm",
+    "placeName": "七星山",
+    "province": "辽宁省",
+    "lat": 42.1398,
+    "lng": 123.33758,
+    "userId": "0775caae-08d9-4f2b-84fc-8bd0a36d2ed3",
+    "authorMode": "account",
+    "status": "pending",
+    "createdAt": "2026-06-11T01:26:24.343Z",
+    "reviewedAt": null
+  },
+  {
+    "id": "1a9af6bd-b9a8-4423-a28b-cfab99771655",
+    "title": "七星山的青草地",
+    "body": "我很喜欢的一片青草地，在高中的忙碌生活中发现这样一片草地，立刻欢喜地设成微信头像，每次来到这里都感受到内心的完全平静，不知道现在这里是什么样子",
+    "mood": "calm",
+    "placeName": "七星山",
+    "province": "辽宁省",
+    "lat": 42.13948,
+    "lng": 123.33801,
+    "userId": "0775caae-08d9-4f2b-84fc-8bd0a36d2ed3",
+    "authorMode": "account",
+    "status": "pending",
+    "createdAt": "2026-06-11T00:50:59.109Z",
+    "reviewedAt": null
+  },
+  {
+    "id": "seed-2",
+    "title": "把话留给江风",
+    "body": "我在武汉江边散步到很晚，想说的话没有发出去。后来风吹过来，我突然不急着被谁理解了。",
+    "mood": "calm",
+    "placeName": "武汉江滩",
+    "province": "湖北省",
+    "lat": 30.5949,
+    "lng": 114.3055,
+    "status": "approved",
+    "createdAt": "2026-05-23T14:12:00.000Z",
+    "reviewedAt": "2026-05-23T18:03:00.000Z"
+  },
+  {
+    "id": "seed-3",
+    "title": "南方雨天",
+    "body": "广州的雨很会替人保密。那天我坐在便利店窗边，把难过吃成了一碗热关东煮。",
+    "mood": "tender",
+    "placeName": "广州越秀",
+    "province": "广东省",
+    "lat": 23.1291,
+    "lng": 113.2644,
+    "status": "approved",
+    "createdAt": "2026-05-28T09:45:00.000Z",
+    "reviewedAt": "2026-05-28T11:11:00.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "name": "global-memory-map",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Global anonymous memory map platform. Users can register, submit location-based memories, and browse others' anonymous submissions worldwide. Admin moderation backend included.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

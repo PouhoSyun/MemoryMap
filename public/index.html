@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Memory Map - Global Memory Atlas</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="map-stage" aria-label="Global anonymous memory map">
+        <div class="topbar">
+          <div>
+            <p class="kicker">Global Memory Atlas</p>
+            <h1>Memory Map</h1>
+          </div>
+          <div class="top-actions" role="group" aria-label="View actions">
+            <button class="icon-btn" id="openLang" type="button" title="Language" aria-label="Language">
+              <span aria-hidden="true">🌐</span>
+            </button>
+            <button class="icon-btn" id="openSubmit" type="button" title="Submit" aria-label="Submit">
+              <span aria-hidden="true">+</span>
+            </button>
+            <button class="icon-btn" id="openInfo" type="button" title="About" aria-label="About">
+              <span aria-hidden="true">i</span>
+            </button>
+            <button class="icon-btn" id="openMine" type="button" title="My Posts" aria-label="My Posts">
+              <span aria-hidden="true">≡</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="map-canvas" id="mapCanvas" aria-label="OpenStreetMap interactive map">
+          <div id="map"></div>
+          <div class="hint-chip">Click on the map to select a location for your memory</div>
+        </div>
+      </section>
+
+      <aside class="panel" aria-live="polite">
+        <div class="panel-tabs" role="tablist" aria-label="Content panel">
+          <button class="tab active" data-tab="read" type="button">Read</button>
+          <button class="tab" data-tab="submit" type="button">Submit</button>
+          <button class="tab" data-tab="mine" type="button">My Posts</button>
+          <button class="tab" data-tab="about" type="button">About</button>
+        </div>
+
+        <section class="tab-panel active" id="readPanel">
+          <div class="panel-heading">
+            <p class="eyebrow">Anonymous Echoes</p>
+            <h2>Share memories tied to places around the world.</h2>
+          </div>
+          <div class="filters" id="filters"></div>
+          <div class="story-list" id="storyList"></div>
+        </section>
+
+        <section class="tab-panel" id="submitPanel">
+          <div class="panel-heading">
+            <p class="eyebrow" id="submitIdentity">Submit as guest / Pending review</p>
+            <h2>Write to a place, write to yourself.</h2>
+          </div>
+          <form id="submitForm" class="stack">
+            <label>
+              <span>Title</span>
+              <input name="title" maxlength="40" required placeholder="e.g.: The bridge at dawn" />
+            </label>
+            <label>
+              <span>Content</span>
+              <textarea name="body" maxlength="1200" required placeholder="Keep it real. No need for perfection."></textarea>
+            </label>
+            <div class="field-grid">
+              <label>
+                <span>Mood</span>
+                <select name="mood">
+                  <option value="lonely">Lonely</option>
+                  <option value="tender">Tender</option>
+                  <option value="calm">Calm</option>
+                  <option value="confused">Confused</option>
+                  <option value="hopeful">Hopeful</option>
+                  <option value="anxious">Anxious</option>
+                  <option value="sad">Sad</option>
+                  <option value="angry">Angry</option>
+                  <option value="grateful">Grateful</option>
+                  <option value="missing">Missing</option>
+                  <option value="relieved">Relieved</option>
+                  <option value="tired">Tired</option>
+                  <option value="secret">Secret</option>
+                </select>
+              </label>
+              <label>
+                <span>Region</span>
+                <select id="mainRegionSelect"></select>
+              </label>
+              <label>
+                <span>Country</span>
+                <select name="province" id="provinceSelect" required></select>
+              </label>
+            </div>
+            <label>
+              <span>Location Name</span>
+              <input name="placeName" maxlength="60" required placeholder="City, street, building, station, etc." />
+            </label>
+            <div class="coords">
+              <label>
+                <span>Latitude</span>
+                <input name="lat" id="latInput" inputmode="decimal" readonly required />
+              </label>
+              <label>
+                <span>Longitude</span>
+                <input name="lng" id="lngInput" inputmode="decimal" readonly required />
+              </label>
+            </div>
+            <p class="microcopy">Coordinates must be valid (lat: -90 to 90, lng: -180 to 180). Logged-in submissions can be tracked in "My Posts". Guest submissions are published immediately but cannot be recovered.</p>
+            <button class="primary-btn" type="submit">Submit to Review</button>
+            <p class="status-line" id="submitStatus"></p>
+          </form>
+        </section>
+
+        <section class="tab-panel" id="minePanel">
+          <div class="panel-heading">
+            <p class="eyebrow">Account</p>
+            <h2>Log in to track your submissions.</h2>
+          </div>
+
+          <div id="authBox" class="auth-box">
+            <form id="loginForm" class="auth-form">
+              <label>
+                <span>Username</span>
+                <input name="username" autocomplete="username" placeholder="3-32 characters" />
+              </label>
+              <label>
+                <span>Password</span>
+                <input name="password" type="password" autocomplete="current-password" placeholder="At least 6 characters" />
+              </label>
+              <button class="primary-btn" type="submit">Log In</button>
+            </form>
+            <form id="registerForm" class="auth-form">
+              <label>
+                <span>Create Account</span>
+                <input name="username" autocomplete="username" placeholder="3-32 characters: letters, numbers, hyphen, underscore" />
+              </label>
+              <label>
+                <span>Set Password</span>
+                <input name="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" />
+              </label>
+              <button class="secondary-btn wide" type="submit">Register & Log In</button>
+            </form>
+            <p class="microcopy">You can submit without logging in. Guest submissions are published immediately but won't appear in your account.</p>
+            <p class="status-line" id="authStatus"></p>
+          </div>
+
+          <div id="mineBox" class="mine-box hidden">
+            <div class="account-row">
+              <div>
+                <p class="eyebrow">Current Account</p>
+                <strong id="currentUsername"></strong>
+              </div>
+              <button class="secondary-btn" id="logoutButton" type="button">Log Out</button>
+            </div>
+            <div class="toolbar">
+              <button class="secondary-btn active" data-my-status="all" type="button">All</button>
+              <button class="secondary-btn" data-my-status="pending" type="button">Pending</button>
+              <button class="secondary-btn" data-my-status="approved" type="button">Published</button>
+              <button class="secondary-btn" data-my-status="rejected" type="button">Rejected</button>
+            </div>
+            <div class="mine-list" id="mineList"></div>
+          </div>
+
+          <div id="adminBox" class="admin-box hidden">
+            <div class="account-row">
+              <div>
+                <p class="eyebrow">Admin Panel</p>
+                <strong id="adminUsername"></strong>
+              </div>
+              <button class="secondary-btn" id="adminLogoutButton" type="button">Log Out</button>
+            </div>
+            <div class="toolbar">
+              <button class="secondary-btn active" data-admin-filter="all" type="button">All</button>
+              <button class="secondary-btn" data-admin-filter="approved" type="button">Published</button>
+              <button class="secondary-btn" data-admin-filter="pending" type="button">Pending</button>
+              <button class="secondary-btn" data-admin-filter="rejected" type="button">Rejected</button>
+            </div>
+            <div class="admin-posts-list" id="adminPostsList"></div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="aboutPanel">
+          <div class="panel-heading">
+            <p class="eyebrow">About</p>
+            <h2>A public memory tree that doesn't demand answers.</h2>
+          </div>
+          <div class="about-copy">
+            <p>Memory Map is a global platform for personal emotions, daily moments, secrets, regrets, gratitude, dreams, and farewells—anything that doesn't fit neat categories.</p>
+            <p>It's not a crisis hotline or a judgment platform. We maintain minimal moderation: protecting privacy, preventing attacks, rejecting illegal or dangerous content.</p>
+            <p>Locations anchor memories to coordinates on the world map. Base map data from OpenStreetMap. Submissions from anywhere on Earth are welcome.</p>
+            <button class="secondary-btn" id="openFeedback" type="button" style="margin-top:12px;">Submit Feedback</button>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <template id="storyTemplate">
+      <article class="story-card">
+        <button class="story-button" type="button">
+          <span class="story-topline"></span>
+          <strong></strong>
+          <p></p>
+        </button>
+      </article>
+    </template>
+
+    <template id="mineTemplate">
+      <article class="mine-card">
+        <div>
+          <p class="story-topline"></p>
+          <h3></h3>
+          <p class="mine-body"></p>
+          <button class="delete-btn" type="button" data-post-id="">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <template id="adminPostTemplate">
+      <article class="admin-post-card">
+        <div>
+          <p class="story-topline"></p>
+          <h3></h3>
+          <p class="post-body"></p>
+          <div class="admin-actions">
+            <button class="delete-btn" type="button" data-post-id="">Delete</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <!-- Feedback modal -->
+    <div id="feedbackModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Submit Feedback</h2>
+          <button class="modal-close" id="closeFeedback" type="button">×</button>
+        </div>
+        <form id="feedbackForm" class="stack">
+          <label>
+            <span>Type</span>
+            <select name="type">
+              <option value="bug">Bug Report</option>
+              <option value="suggestion">Suggestion</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>
+            <span>Title *</span>
+            <input name="title" maxlength="100" required placeholder="Brief description" />
+          </label>
+          <label>
+            <span>Content *</span>
+            <textarea name="content" maxlength="1000" required placeholder="Details..." style="min-height:80px;"></textarea>
+          </label>
+          <label>
+            <span>Contact (optional)</span>
+            <input name="contact" maxlength="100" placeholder="Email or other contact" />
+          </label>
+          <button class="primary-btn" type="submit">Submit</button>
+          <p class="status-line" id="feedbackStatus"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/app-global.js"></script>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "0775caae-08d9-4f2b-84fc-8bd0a36d2ed3",
+    "username": "moodylitchee",
+    "passwordHash": "618e853cd08133a59c9df941c429df28:cbda40732bc1cc8e23f7f76aad42bd3c77091e35a5f38b0204192bca3d1ef46f568cca79931f8ed7017dab4faba1ced26dc5fe95306d5a613f4749899e4649fb",
+    "createdAt": "2026-06-11T00:51:20.031Z"
+  },
+  {
+    "id": "a49deec9-ab46-4c28-b806-a4326759290d",
+    "username": "admin",
+    "passwordHash": "7c830d1206724ef89f9e5b3bbd6b8b40:1813f697537b6e79e51cecf19a539415dd12125b89b346fdd91d75a45a61dfc3d0a0de110adb17c0c40216b5868c89b0122840432a6e25c9c7da1fc54062995d",
+    "role": "admin",
+    "createdAt": "2026-06-11T07:02:17.056Z"
+  },
+  {
+    "id": "f158d626-81bd-46f4-93d5-f24ef5d87550",
+    "username": "Habagat",
+    "passwordHash": "e23e7820de6ba522005db84b5f1b61df:5f2bef13787a07ec88d2d7c2256137385c3d28ec65c1621efab78b3d74e598c4bd65275b5a8367bc0907014cb0b343b8e3f22292113c4fc9a4665cb3bee5bb1d",
+    "role": "user",
+    "createdAt": "2026-06-11T14:47:38.773Z"
+  },
+  {
+    "id": "31a5f812-1db9-4dd8-946e-a53659832dc6",
+    "username": "ziyuxiao",
+    "passwordHash": "5c813edc0df870b9da52df83707b86ff:3a2dbd4a54512f0bba7d70a2ee71b8ea5325885df281268fdb7d71574d2ba64c0f64190983a60a5e768a20e0ef00e6c26d82a0a27309e99edaab5337408993c1",
+    "role": "user",
+    "createdAt": "2026-06-11T14:48:44.739Z"
+  }
+]
