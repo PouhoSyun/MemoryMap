@@ -1,4 +1,3 @@
-cat > /opt/memory-map/README.md << 'EOF'
 # Memory Map 🗺️
 
 一个全球匿名记忆地图应用，用户可以在地图上分享和浏览特定地点的个人回忆。
@@ -27,9 +26,3 @@ cat > /opt/memory-map/README.md << 'EOF'
 ## 许可证
 
 MIT License
-EOF
-
-# 提交
-git add README.md
-git commit -m "Add README"
-git push
