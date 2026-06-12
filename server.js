@@ -1,4 +1,5 @@
 const http = require("http");
+const { createReadStream } = require("fs");
 const fs = require("fs/promises");
 const path = require("path");
 const { randomBytes, randomUUID, scryptSync, timingSafeEqual } = require("crypto");
@@ -10,41 +11,13 @@ const DATA_DIR = path.join(ROOT, "data");
 const POSTS_FILE = path.join(DATA_DIR, "posts.json");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 const FEEDBACK_FILE = path.join(DATA_DIR, "feedback.json");
+const CHINA_GEOJSON_FILE = path.join(ROOT, "city-zh.geojson");
+const GLOBAL_GEOJSON_FILE = path.join(ROOT, "country-global.geojson");
 
 const PORT = Number(process.env.PORT || 4172);
 
-// Load GeoJSON files for reverse geocoding
-let chinaGeoJSON = null;
-let globalGeoJSON = null;
-
-async function loadGeoJSONFiles() {
-  try {
-    const chinaPath = path.join(ROOT, 'city-zh.geojson');
-    const globalPath = path.join(ROOT, 'country-global.geojson');
-    
-    const chinaRaw = await fs.readFile(chinaPath, 'utf8');
-    chinaGeoJSON = JSON.parse(chinaRaw);
-    console.log('China GeoJSON loaded for reverse geocoding');
-    
-    const globalRaw = await fs.readFile(globalPath, 'utf8');
-    globalGeoJSON = JSON.parse(globalRaw);
-    console.log('Global GeoJSON loaded for reverse geocoding');
-  } catch (e) {
-    console.warn('Failed to load GeoJSON files:', e.message);
-  }
-}
-
-// Load Global GeoJSON for country reverse geocoding
-async function loadGlobalGeoJSON() {
-  try {
-    const geoJsonPath = path.join(ROOT, 'country-global.geojson');
-    const raw = await fs.readFile(geoJsonPath, 'utf8');
-    globalGeoJSON = JSON.parse(raw);
-    console.log('Global GeoJSON loaded for country reverse geocoding');
-  } catch (e) {
-    console.warn('Failed to load Global GeoJSON:', e.message);
-  }
-}
+let storeInitialized = false;
+let storeInitPromise = null;
 
 // Point-in-polygon test using ray casting algorithm
 function pointInPolygon(point, polygon) {
@@ -69,6 +42,114 @@ function getFeatureRings(feature) {
   return [];
 }
 
+function ringMayContainPoint(ring, point) {
+  const [lng, lat] = point;
+  let minLng = Infinity;
+  let minLat = Infinity;
+  let maxLng = -Infinity;
+  let maxLat = -Infinity;
+  for (const coord of ring) {
+    if (!Array.isArray(coord) || coord.length < 2) continue;
+    const [coordLng, coordLat] = coord;
+    if (!Number.isFinite(coordLng) || !Number.isFinite(coordLat)) continue;
+    minLng = Math.min(minLng, coordLng);
+    minLat = Math.min(minLat, coordLat);
+    maxLng = Math.max(maxLng, coordLng);
+    maxLat = Math.max(maxLat, coordLat);
+  }
+  if (!Number.isFinite(minLng)) return true;
+  return lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat;
+}
+
+function featureContainsPoint(feature, point) {
+  for (const ring of getFeatureRings(feature)) {
+    if (!ringMayContainPoint(ring, point)) continue;
+    if (pointInPolygon(point, ring)) return true;
+  }
+  return false;
+}
+
+function scanGeoJSONFeatures(filePath, visitFeature) {
+  return new Promise((resolve, reject) => {
+    const stream = createReadStream(filePath, { encoding: "utf8", highWaterMark: 256 * 1024 });
+    let searchBuffer = "";
+    let foundFeaturesKey = false;
+    let inFeaturesArray = false;
+    let inFeature = false;
+    let inString = false;
+    let escaping = false;
+    let depth = 0;
+    let featureText = "";
+    let settled = false;
+
+    const settle = (error, value = null) => {
+      if (settled) return;
+      settled = true;
+      stream.destroy();
+      if (error) reject(error);
+      else resolve(value);
+    };
+
+    stream.on("data", chunk => {
+      if (settled) return;
+      for (const char of chunk) {
+        if (!inFeaturesArray) {
+          searchBuffer = (searchBuffer + char).slice(-32);
+          if (searchBuffer.includes('"features"')) foundFeaturesKey = true;
+          if (foundFeaturesKey && char === "[") inFeaturesArray = true;
+          continue;
+        }
+
+        if (!inFeature) {
+          if (char === "]") return settle(null, null);
+          if (char !== "{") continue;
+          inFeature = true;
+          inString = false;
+          escaping = false;
+          depth = 1;
+          featureText = "{";
+          continue;
+        }
+
+        featureText += char;
+        if (escaping) {
+          escaping = false;
+          continue;
+        }
+        if (inString && char === "\\") {
+          escaping = true;
+          continue;
+        }
+        if (char === '"') {
+          inString = !inString;
+          continue;
+        }
+        if (inString) continue;
+        if (char === "{") depth += 1;
+        else if (char === "}") depth -= 1;
+
+        if (depth === 0) {
+          try {
+            const result = visitFeature(JSON.parse(featureText));
+            if (result) return settle(null, result);
+          } catch (error) {
+            return settle(error);
+          }
+          inFeature = false;
+          featureText = "";
+        }
+      }
+    });
+
+    stream.on("error", error => {
+      if (!settled) reject(error);
+    });
+    stream.on("end", () => {
+      if (!settled) resolve(null);
+    });
+  });
+}
+
 function getLocalizedCountryName(properties = {}, useChinese = false) {
   const chineseName = normalizeText(properties.FCNAME, 80);
   const englishName = normalizeText(properties.NAME, 80);
@@ -78,79 +159,61 @@ function getLocalizedCountryName(properties = {}, useChinese = false) {
 // Reverse geocode a coordinate - returns { country, province, city }
 // For China: all three fields filled with province/city info (all Chinese)
 // For other countries: country filled with Chinese name, province and city set to country name (all Chinese)
-function reverseGeocodeLocation(lat, lng, useChinese = false) {
+async function reverseGeocodeLocation(lat, lng, useChinese = false) {
   const point = [lng, lat]; // GeoJSON uses [lng, lat]
 
   // First try China - 中国优先判定
-  if (chinaGeoJSON && chinaGeoJSON.features) {
-    for (const feature of chinaGeoJSON.features) {
-      for (const coords of getFeatureRings(feature)) {
-        if (pointInPolygon(point, coords)) {
-          return {
-            country: '中国',
-            province: feature.properties.province,
-            city: feature.properties.city,
-            source: 'china'
-          };
-        }
-      }
+  const chinaResult = await scanGeoJSONFeatures(CHINA_GEOJSON_FILE, feature => {
+    if (featureContainsPoint(feature, point)) {
+      return {
+        country: "中国",
+        province: feature.properties.province,
+        city: feature.properties.city,
+        source: "china"
+      };
     }
-  }
+    return null;
+  });
+  if (chinaResult) return chinaResult;
 
   // Not in China, try global - 国外判定
   // 中文版本：总是使用 FCNAME（中文国名）
   // 国外缺少省市数据，用国名填充 province 和 city
-  if (globalGeoJSON && globalGeoJSON.features) {
-    for (const feature of globalGeoJSON.features) {
-      const countryName = getLocalizedCountryName(feature.properties, useChinese);
-      if (!countryName) continue;
-      for (const coords of getFeatureRings(feature)) {
-        if (pointInPolygon(point, coords)) {
-          return {
-            country: countryName,
-            province: countryName,
-            city: countryName,
-            source: 'global'
-          };
-        }
-      }
-    }
-  }
-
-  return null;
+  return scanGeoJSONFeatures(GLOBAL_GEOJSON_FILE, feature => {
+    if (!featureContainsPoint(feature, point)) return null;
+    const countryName = getLocalizedCountryName(feature.properties, useChinese);
+    if (!countryName) return null;
+    return {
+      country: countryName,
+      province: countryName,
+      city: countryName,
+      source: "global"
+    };
+  });
 }
 
 // Reverse geocode a coordinate to find country (global)
-function reverseGeocodeCountry(lat, lng) {
-  if (!globalGeoJSON || !globalGeoJSON.features) return null;
-  
+async function reverseGeocodeCountry(lat, lng) {
   const point = [lng, lat]; // GeoJSON uses [lng, lat]
-  
-  for (const feature of globalGeoJSON.features) {
-    if (!feature.geometry) continue;
-    
-    if (feature.geometry.type === 'Polygon') {
-      const coords = feature.geometry.coordinates[0];
-      if (pointInPolygon(point, coords)) {
-        return {
-          country: feature.properties.NAME,
-          countryZh: feature.properties.FCNAME
-        };
-      }
-    } else if (feature.geometry.type === 'MultiPolygon') {
-      for (const polygon of feature.geometry.coordinates) {
-        const coords = polygon[0];
-        if (pointInPolygon(point, coords)) {
-          return {
-            country: feature.properties.NAME,
-            countryZh: feature.properties.FCNAME
-          };
-        }
-      }
+  return scanGeoJSONFeatures(GLOBAL_GEOJSON_FILE, feature => {
+    if (!featureContainsPoint(feature, point)) return null;
+    return {
+      country: feature.properties.NAME,
+      countryZh: feature.properties.FCNAME
+    };
+  });
+}
+
+async function safeReverseGeocodeLocation(lat, lng, useChinese = false) {
+  try {
+    return await reverseGeocodeLocation(lat, lng, useChinese);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      console.warn("Reverse geocode data file missing:", error.message);
+      return null;
     }
+    throw error;
   }
-  
-  return null;
 }
 const HOST = process.env.HOST || "0.0.0.0";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "taxtax-admin";
@@ -253,21 +316,29 @@ const seedPosts = [
 // 地理限制已移除，支持全球坐标投稿
 
 async function ensureStore() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await ensureLogDir();
-  await loadGeoJSONFiles();
-  await loadGlobalGeoJSON();
-  try {
-    await fs.access(POSTS_FILE);
-  } catch {
-    await fs.writeFile(POSTS_FILE, JSON.stringify(seedPosts, null, 2));
+  if (storeInitialized) return;
+  if (!storeInitPromise) {
+    storeInitPromise = (async () => {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await ensureLogDir();
+      try {
+        await fs.access(POSTS_FILE);
+      } catch {
+        await fs.writeFile(POSTS_FILE, JSON.stringify(seedPosts, null, 2));
+      }
+      try {
+        await fs.access(USERS_FILE);
+      } catch {
+        await fs.writeFile(USERS_FILE, JSON.stringify([], null, 2));
+      }
+      await ensureAdminAccount();
+      storeInitialized = true;
+    })().catch(error => {
+      storeInitPromise = null;
+      throw error;
+    });
   }
-  try {
-    await fs.access(USERS_FILE);
-  } catch {
-    await fs.writeFile(USERS_FILE, JSON.stringify([], null, 2));
-  }
-  await ensureAdminAccount();
+  await storeInitPromise;
 }
 
 async function ensureAdminAccount() {
@@ -487,7 +558,7 @@ function isValidCoordinate(lat, lng) {
 function sanitizeInput(input) {
   if (typeof input !== "string") return "";
   // Remove null bytes and control characters
-  return input.replace(/[ -]/g, "");
+  return input.replace(/[\x00-\x1F\x7F]/g, "");
 }
 
 function validateCredentials(input, isRegister = false) {
@@ -612,7 +683,7 @@ async function handleApi(req, res) {
       return;
     }
 
-    const result = reverseGeocodeLocation(lat, lng, useChinese);
+    const result = await safeReverseGeocodeLocation(lat, lng, useChinese);
     if (result) {
       send(res, 200, { success: true, country: result.country, province: result.province, city: result.city, source: result.source });
     } else {
