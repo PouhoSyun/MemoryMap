@@ -348,6 +348,60 @@ h1 {
   box-shadow: 0 0 0 2px rgba(38, 95, 142, 0.12);
 }
 
+.story-card.expanded {
+  background: #fff7e8;
+  box-shadow: 0 10px 22px rgba(38, 95, 142, 0.1);
+}
+
+.story-card.expanded .story-button {
+  padding-bottom: 10px;
+}
+
+.story-card.expanded .story-button p {
+  display: none;
+}
+
+.story-expanded {
+  display: grid;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+.story-expanded p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.72;
+  white-space: pre-wrap;
+}
+
+.story-expanded dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding-top: 2px;
+}
+
+.story-expanded dl div {
+  min-width: 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(38, 95, 142, 0.16);
+}
+
+.story-expanded dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.story-expanded dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .story-button {
   width: 100%;
   border: 0;
@@ -404,6 +458,19 @@ select {
   background: #fffaf1;
 }
 
+select:disabled {
+  color: rgba(39, 37, 32, 0.72);
+  background: #f0eadf;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  accent-color: var(--green);
+}
+
 textarea {
   min-height: 150px;
   resize: vertical;
@@ -419,6 +486,16 @@ textarea {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+.manual-location-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manual-location-toggle span {
+  color: var(--ink);
 }
 
 .microcopy,

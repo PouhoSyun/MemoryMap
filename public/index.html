@@ -61,39 +61,47 @@
           </div>
           <form id="submitForm" class="stack">
             <label>
-              <span>Title</span>
-              <input name="title" maxlength="40" required placeholder="e.g.: The bridge at dawn" />
+              <span>Title (optional)</span>
+              <input name="title" maxlength="40" placeholder="e.g.: The bridge at dawn" />
             </label>
             <label>
               <span>Content</span>
               <textarea name="body" maxlength="1200" required placeholder="Keep it real. No need for perfection."></textarea>
             </label>
+            <label>
+              <span>Author Name (optional)</span>
+              <input name="author" maxlength="30" placeholder="Your name or nickname" />
+            </label>
+            <label>
+              <span>Mood</span>
+              <select name="mood">
+                <option value="lonely">Lonely</option>
+                <option value="tender">Tender</option>
+                <option value="calm">Calm</option>
+                <option value="confused">Confused</option>
+                <option value="hopeful">Hopeful</option>
+                <option value="anxious">Anxious</option>
+                <option value="sad">Sad</option>
+                <option value="angry">Angry</option>
+                <option value="grateful">Grateful</option>
+                <option value="missing">Missing</option>
+                <option value="relieved">Relieved</option>
+                <option value="tired">Tired</option>
+                <option value="secret">Secret</option>
+              </select>
+            </label>
             <div class="field-grid">
               <label>
-                <span>Mood</span>
-                <select name="mood">
-                  <option value="lonely">Lonely</option>
-                  <option value="tender">Tender</option>
-                  <option value="calm">Calm</option>
-                  <option value="confused">Confused</option>
-                  <option value="hopeful">Hopeful</option>
-                  <option value="anxious">Anxious</option>
-                  <option value="sad">Sad</option>
-                  <option value="angry">Angry</option>
-                  <option value="grateful">Grateful</option>
-                  <option value="missing">Missing</option>
-                  <option value="relieved">Relieved</option>
-                  <option value="tired">Tired</option>
-                  <option value="secret">Secret</option>
-                </select>
-              </label>
-              <label>
-                <span>Region</span>
-                <select id="mainRegionSelect"></select>
-              </label>
-              <label>
                 <span>Country</span>
-                <select name="province" id="provinceSelect" required></select>
+                <select name="country" id="countrySelect" required></select>
+              </label>
+              <label>
+                <span>Province/State</span>
+                <select name="province" id="provinceSelect"></select>
+              </label>
+              <label>
+                <span>City</span>
+                <select name="city" id="citySelect"></select>
               </label>
             </div>
             <label>

@@ -43,8 +43,141 @@ const moodColors = {
 };
 
 // Two-level region data — default North America
+const chinaProvinces = [
+  "北京市", "天津市", "河北省", "山西省", "内蒙古自治区",
+  "辽宁省", "吉林省", "黑龙江省",
+  "上海市", "江苏省", "浙江省", "安徽省", "福建省", "江西省", "山东省",
+  "河南省", "湖北省", "湖南省", "广东省", "广西壮族自治区", "海南省",
+  "重庆市", "四川省", "贵州省", "云南省", "西藏自治区",
+  "陕西省", "甘肃省", "青海省", "宁夏回族自治区", "新疆维吾尔自治区",
+  "香港特别行政区", "澳门特别行政区", "台湾省"
+];
+
+const chinaCities = {
+  "北京市": [
+    "北京市"
+  ],
+  "天津市": [
+    "天津市"
+  ],
+  "河北省": [
+    "石家庄市",
+    "唐山市",
+    "秦皇岛市"
+  ],
+  "山西省": [
+    "太原市",
+    "大同市"
+  ],
+  "内蒙古自治区": [
+    "呼和浩特市"
+  ],
+  "辽宁省": [
+    "沈阳市",
+    "大连市"
+  ],
+  "吉林省": [
+    "长春市",
+    "吉林市"
+  ],
+  "黑龙江省": [
+    "哈尔滨市",
+    "齐齐哈尔市"
+  ],
+  "上海市": [
+    "上海市"
+  ],
+  "江苏省": [
+    "南京市",
+    "苏州市"
+  ],
+  "浙江省": [
+    "杭州市",
+    "宁波市"
+  ],
+  "安徽省": [
+    "合肥市",
+    "芜湖市"
+  ],
+  "福建省": [
+    "福州市",
+    "厦门市"
+  ],
+  "江西省": [
+    "南昌市",
+    "赣州市"
+  ],
+  "山东省": [
+    "济南市",
+    "青岛市"
+  ],
+  "河南省": [
+    "郑州市",
+    "洛阳市"
+  ],
+  "湖北省": [
+    "武汉市",
+    "襄阳市"
+  ],
+  "湖南省": [
+    "长沙市",
+    "株洲市"
+  ],
+  "广东省": [
+    "广州市",
+    "深圳市"
+  ],
+  "广西壮族自治区": [
+    "南宁市"
+  ],
+  "海南省": [
+    "海口市"
+  ],
+  "重庆市": [
+    "重庆市"
+  ],
+  "四川省": [
+    "成都市",
+    "绵阳市"
+  ],
+  "贵州省": [
+    "贵阳市"
+  ],
+  "云南省": [
+    "昆明市"
+  ],
+  "西藏自治区": [
+    "拉萨市"
+  ],
+  "陕西省": [
+    "西安市"
+  ],
+  "甘肃省": [
+    "兰州市"
+  ],
+  "青海省": [
+    "西宁市"
+  ],
+  "宁夏回族自治区": [
+    "银川市"
+  ],
+  "新疆维吾尔自治区": [
+    "乌鲁木齐市"
+  ],
+  "香港特别行政区": [
+    "香港"
+  ],
+  "澳门特别行政区": [
+    "澳门"
+  ],
+  "台湾省": [
+    "台北市",
+    "高雄市"
+  ]
+};
+
 const regions = {
-  "North America": ["USA", "Canada", "Mexico"],
+  "China": chinaProvinces,
   "Central America": ["Guatemala", "Honduras", "El Salvador", "Nicaragua", "Costa Rica", "Panama", "Cuba", "Haiti", "Dominican Republic"],
   "South America": ["Brazil", "Argentina", "Chile", "Colombia", "Peru", "Venezuela", "Ecuador", "Bolivia", "Paraguay", "Uruguay"],
   "Western Europe": ["UK", "France", "Germany", "Netherlands", "Belgium", "Switzerland", "Austria", "Ireland", "Portugal", "Spain"],
@@ -64,26 +197,9 @@ const regions = {
   "Oceania": ["Australia", "New Zealand", "Papua New Guinea", "Fiji"]
 };
 
-const regionCoordinates = {
-  "North America": { "USA": [37.0902, -95.7129], "Canada": [56.1304, -106.3468], "Mexico": [23.6345, -102.5528] },
-  "Central America": { "Guatemala": [15.7835, -90.2308], "Honduras": [15.1999, -86.2419], "El Salvador": [13.7942, -88.8965], "Nicaragua": [12.8654, -85.2072], "Costa Rica": [9.7489, -83.7534], "Panama": [8.538, -80.7821], "Cuba": [21.5218, -77.7812], "Haiti": [18.9712, -72.2852], "Dominican Republic": [18.7357, -70.1627] },
-  "South America": { "Brazil": [-14.235, -51.9253], "Argentina": [-38.4161, -63.6167], "Chile": [-35.6751, -71.543], "Colombia": [4.5709, -74.2973], "Peru": [-9.19, -75.0152], "Venezuela": [6.4238, -66.5897], "Ecuador": [-1.8312, -78.1834], "Bolivia": [-16.2902, -63.5887], "Paraguay": [-23.4425, -58.4438], "Uruguay": [-32.5228, -55.7658] },
-  "Western Europe": { "UK": [55.3781, -3.436], "France": [46.2276, 2.2137], "Germany": [51.1657, 10.4515], "Netherlands": [52.1326, 5.2913], "Belgium": [50.8503, 4.3517], "Switzerland": [46.8182, 8.2275], "Austria": [47.5162, 14.5501], "Ireland": [53.1424, -7.6921], "Portugal": [39.3999, -8.2245], "Spain": [40.4637, -3.7492] },
-  "Eastern Europe": { "Poland": [51.9194, 19.1451], "Czech Republic": [49.8175, 15.473], "Slovakia": [48.669, 19.699], "Hungary": [47.1625, 19.5033], "Romania": [45.9432, 24.9668], "Bulgaria": [42.7339, 25.4858], "Croatia": [45.1, 15.2], "Serbia": [44.0165, 21.0059], "Ukraine": [48.3794, 31.1656] },
-  "Northern Europe": { "Norway": [60.472, 8.4689], "Sweden": [60.1282, 18.6435], "Finland": [61.9241, 25.7482], "Denmark": [56.2639, 9.5018], "Iceland": [64.9631, -19.0208] },
-  "Southern Europe": { "Italy": [41.8719, 12.5674], "Greece": [39.0742, 21.8243], "Turkey": [38.9637, 35.2433], "Cyprus": [35.1264, 33.4299] },
-  "Middle East": { "Israel": [31.0461, 34.8516], "Saudi Arabia": [23.8859, 45.0792], "UAE": [23.4241, 53.8478], "Iran": [32.4279, 53.688], "Iraq": [33.2232, 43.6793], "Jordan": [30.5852, 36.2384], "Lebanon": [33.8547, 35.8623], "Kuwait": [29.3759, 47.9774], "Qatar": [25.3548, 51.1839] },
-  "North Africa": { "Egypt": [26.8206, 30.8025], "Libya": [26.3351, 17.2283], "Tunisia": [33.8869, 9.5375], "Algeria": [28.0339, 1.6596], "Morocco": [31.7917, -7.0926] },
-  "West Africa": { "Nigeria": [9.082, 8.6753], "Ghana": [7.9465, -1.0232], "Senegal": [14.4974, -14.4524], "Ivory Coast": [7.54, -5.5471], "Guinea": [11.0, -10.9408] },
-  "East Africa": { "Kenya": [-0.0236, 37.9062], "Ethiopia": [9.145, 40.4897], "Tanzania": [-6.369, 34.8888], "Uganda": [1.3733, 32.2903], "Rwanda": [-1.9403, 29.8739] },
-  "Central Africa": { "Congo": [-0.228, 15.827], "Cameroon": [3.848, 11.502], "Central African Republic": [6.6111, 20.9394], "Chad": [15.4542, 18.7322] },
-  "Southern Africa": { "South Africa": [-30.5595, 22.9375], "Zimbabwe": [-19.0154, 29.1549], "Zambia": [-13.1339, 27.8493], "Mozambique": [-18.6657, 35.5296], "Botswana": [-22.3285, 24.6849] },
-  "Russia & Central Asia": { "Russia": [61.524, 105.3188], "Kazakhstan": [48.0196, 66.9237], "Uzbekistan": [41.3775, 64.5853], "Kyrgyzstan": [41.2044, 74.7661], "Tajikistan": [38.861, 71.2761] },
-  "East Asia": { "Japan": [36.2048, 138.2529], "South Korea": [35.9078, 127.7669], "China": [35.8617, 104.1954], "North Korea": [40.3399, 127.5101], "Mongolia": [46.8625, 103.8467] },
-  "Southeast Asia": { "Thailand": [15.87, 100.9925], "Vietnam": [14.0583, 108.2772], "Indonesia": [-0.7893, 113.9213], "Malaysia": [4.2105, 101.9758], "Philippines": [12.8797, 121.774], "Singapore": [1.3521, 103.8198], "Myanmar": [21.9162, 95.956], "Cambodia": [12.5657, 104.991], "Laos": [19.8563, 102.4955] },
-  "South Asia": { "India": [20.5937, 78.9629], "Pakistan": [30.3753, 69.3451], "Bangladesh": [23.685, 90.3563], "Sri Lanka": [7.8731, 80.7718], "Nepal": [28.3949, 84.124], "Bhutan": [27.5142, 90.4336] },
-  "Oceania": { "Australia": [-25.2744, 133.7751], "New Zealand": [-40.9006, 172.886], "Papua New Guinea": [-6.315, 143.9555], "Fiji": [-17.7134, 178.065] }
-};
+const allCountries = ["AFGHANISTAN","ALBANIA","ALGERIA","AMERICAN SAMOA","ANDORRA","ANGOLA","ANGUILLA","ANTARCTICA","ANTIGUA AND BARBUDA","AREA UNDER DISPUTE","ARGENTINA","ARMENIA","ARUBA","AUSTRALIA","AUSTRIA","AZERBAIJAN","BAHAMAS","BAHRAIN","BANGLADESH","BARBADOS","BELARUS","BELGIUM","BELIZE","BENIN","BERMUDA","BHUTAN","BOLIVIA","BOSNIA AND HERZEGOVINA","BOTSWANA","BOUVET ISLAND","BRAZIL","BRITISH INDIAN OCEAN TERRITORY","BRUNEI","BULGARIA","BURKINA FASO","BURUNDI","CAMBODIA","CAMEROON","CANADA","CANARIAS","CAPE VERDE","CASPIAN SEA","CAYMAN ISLANDS","CENTRAL AFRICAN REPUBLIC","CHAD","CHILE","CHINA","CHRISTMAS ISLAND","COCOS(KEELING) ISLANDS","COLOMBIA","COMOROS","CONGO","CONGO,THE DEMOCRATIC REPUBLIC OF THE","COOK ISLANDS","COSTA RICA","COTE D’IVOIRE","CROATIA","CUBA","CYPRUS","CZECH REPUBLIC","DENMARK","DJIBOUTI","DOMINICA","DOMINICAN REPUBLIC","EAST TIMOR","ECUADOR","EGYPT","EL SALVADOR","EQUATORIAL GUINEA","ERITREA","ESTONIA","ETHIOPIA","FALKLAND ISLANDS(MALVINAS)","FAROE ISLANDS","FIJI","FINLAND","FRANCE","FRENCH GUIANA","FRENCH POLYNESIA","FRENCH SOUTHERN TERRITORIES","GABON","GAMBIA","GEORGIA","GERMANY","GHANA","GIBRALTAR","GREECE","GREENLAND","GRENADA","GUADELOUPE","GUATEMALA","GUINEA","GUINEA-BISSAU","GUYANA","HAITI","HEARD ISLAND AND MCDONALD ISLANDS","HONDURAS","HUNGARY","ICELAND","INDIA","INDONESIA","IRAN","IRAQ","IRELAND","ISRAEL","ITALY","JAMAICA","JAPAN","JORDAN","KAZAKHSTAN","KENYA","KIRIBATI","KOREA, REPUBLIC OF","KOREA,DEMOCRATIC PEOPLE'S REPUBLIC OF","KUWAIT","KYRGYZSTAN","LAOS","LATVIA","LEBANON","LESOTHO","LIBERIA","LIBYA","LIECHTENSTEIN","LITHUANIA","LUXEMBOURG","MACEDONIA,THE FORMER YUGOSLAV REPUBLIC OF","MADAGASCAR","MADEIRA","MALAWI","MALAYSIA","MALDIVES","MALI","MALTA","MARSHALL ISLANDS","MARTINIQUE","MAURITANIA","MAURITIUS","MAYOTTE","MEXICO","MICRONESIA,FEDERATED STATES OF","MOLDOVA","MONACO","MONGOLIA","MONTENEGRO","MONTSERRAT","MOROCCO","MOZAMBIQUE","MYANMAR","NAMIBIA","NAURU","NEPAL","NETHERLANDS","NETHERLANDS ANTILLES","NEW CALEDONIA","NEW ZEALAND","NICARAGUA","NIGER","NIGERIA","NIUE","NORFOLK ISLAND","NORTHERN MARIANA ISLANDS","NORWAY","OMAN","PAKISTAN","PALAU","PANAMA","PAPUA NEW GUINEA","PARAGUAY","PERU","PHILIPPINES","PITCAIRN","POLAND","PORTUGAL","PRINCE EDWARD ISLAND","PUERTO RICO","QATAR","REUNION","ROMANIA","RUSSIAN FEDERATION","RWANDA","SAINT HELENA","SAINT KITTS AND NEVIS","SAINT LUCIA","SAINT PIERRE AND MIQUELON","SAINT VINCENT AND THE GRENADINES","SAMOA","SAN MARINO","SAO TOME AND PRINCIPE","SAUDI ARABIA","SENEGAL","SERBIA","SEYCHELLES","SIERRA LEONE","SINGAPORE","SLOVAKIA","SLOVENIA","SOLOMON ISLANDS","SOMALIA","SOUTH AFRICA","SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS","SPAIN","SRILANKA","SUDAN","SURINAME","SVALBARD AND JAN MAYEN","SWAZILAND","SWEDEN","SWITZERLAND","SYRIAN ARAB REPUBLIC","TAJIKISTAN","TANZANIA","THAILAND","TOGO","TOKELAU","TONGA","TRINIDAD AND TOBAGO","TUNISIA","TURKEY","TURKMENISTAN","TURKS AND CAICOS ISLANDS","TUVALU","UGANDA","UKRAINE","UNITED ARAB EMIRATES","UNITED KINGDOM","UNITED STATES","URUGUAY","UZBEKISTAN","VANUATU","VATICAN","VENEZUELA","VIET NAM","VIRGIN ISLANDS,BRITISH","VIRGIN ISLANDS,U.S.","WAKE ISLAND","WALLIS AND FUTUNA","WESTERN SAHARA","YEMEN","ZAMBIA","ZIMBABWE"];
+
+
 
 const state = {
   posts: [],
@@ -136,6 +252,32 @@ async function api(path, options = {}) {
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.error || "Request failed");
   return payload;
+}
+
+async function reverseGeocodeLocation(lat, lng) {
+  try {
+    const result = await api("/api/reverse-geocode", {
+      method: "POST",
+      body: JSON.stringify({ lat, lng })
+    });
+
+    if (result.success) {
+      // Auto-fill country/province/city based on reverse geocoding
+      $("#countrySelect").value = result.country;
+      renderProvinceOptions(result.country);
+      
+      if (result.country === "China" && result.province) {
+        $("#provinceSelect").value = result.province;
+        renderCityOptions(result.province);
+        if (result.city) {
+          $("#citySelect").value = result.city;
+        }
+      }
+    }
+  } catch (error) {
+    // Silent fail - reverse geocoding is optional
+    console.log("Reverse geocoding not available:", error.message);
+  }
 }
 
 function saveSession(payload) {
@@ -223,6 +365,7 @@ function initMap() {
       return;
     }
     setDraftLocation(lat, lng, "map");
+    reverseGeocodeLocation(lat, lng);
     switchTab("submit");
   });
 }
@@ -255,11 +398,30 @@ function renderMapMarkers() {
       fillColor: moodColors[post.mood] || moodColors.unspecified,
       fillOpacity: 0.92
     }).addTo(state.map);
-    marker.bindPopup(`<strong>${post.title}</strong><br>${post.placeName}`);
-    marker.on("click", () => {
+
+    // Create popup with title, author, and location
+    let popupContent = `<strong>${post.title || "Untitled"}</strong>`;
+    if (post.author) {
+      popupContent += `<br><em>${post.author}</em>`;
+    }
+    let location = post.country || "Unknown";
+    if (post.province && post.province !== post.country) {
+      location += ` / ${post.province}`;
+    }
+    if (post.city && post.city !== post.province && post.city !== post.country) {
+      location += ` / ${post.city}`;
+    }
+    popupContent += `<br>${location} - ${post.placeName}`;
+
+    marker.bindPopup(popupContent);
+    // 使用 openPopup() 确保popup正确展开，然后处理侧栏选择
+    marker.on("click", (e) => {
+      L.DomEvent.stopPropagation(e);
+      marker.openPopup();
       state.selectedId = post.id;
       render();
       switchTab("read");
+    });
     });
     state.markers.set(post.id, marker);
   });
@@ -290,8 +452,22 @@ function renderStories() {
     const node = template.content.cloneNode(true);
     const card = node.querySelector(".story-card");
     const button = node.querySelector(".story-button");
-    node.querySelector(".story-topline").textContent = `${moods[post.mood] || "Unspecified"} / ${post.province} / ${formatDate(post.createdAt)}`;
-    node.querySelector("strong").textContent = post.title;
+    
+    // Build location string: country / province / city or country / city
+    let location = post.country || "Unknown";
+    if (post.province && post.province !== post.country) {
+      location += ` / ${post.province}`;
+    }
+    if (post.city && post.city !== post.province && post.city !== post.country) {
+      location += ` / ${post.city}`;
+    }
+    
+    let topline = `${moods[post.mood] || "Unspecified"} / ${location} / ${formatDate(post.createdAt)}`;
+    if (post.author) {
+      topline += ` / ${post.author}`;
+    }
+    node.querySelector(".story-topline").textContent = topline;
+    node.querySelector("strong").textContent = post.title || "Untitled";
     node.querySelector("p").textContent = post.body;
     card.classList.toggle("selected", state.selectedId === post.id);
     button.addEventListener("click", () => focusPost(post));
@@ -299,42 +475,68 @@ function renderStories() {
   });
 }
 
-function renderMainRegionOptions() {
-  const select = $("#mainRegionSelect");
+function renderCountryOptions() {
+  const select = $("#countrySelect");
   select.innerHTML = "";
-  Object.keys(regions).forEach(r => {
+  allCountries.forEach(country => {
     const option = document.createElement("option");
-    option.value = r;
-    option.textContent = r;
+    option.value = country;
+    option.textContent = country;
     select.append(option);
   });
+  
+  // Set default to China
+  select.value = "CHINA";
+  renderProvinceOptions("CHINA");
 }
 
-function renderSubRegionOptions(mainRegion) {
+function renderProvinceOptions(country) {
   const select = $("#provinceSelect");
   select.innerHTML = "";
-  const subs = regions[mainRegion] || [];
-  subs.forEach(sub => {
+  
+  if (country === "CHINA") {
+    // China provinces
+    chinaProvinces.forEach(prov => {
+      const option = document.createElement("option");
+      option.value = prov;
+      option.textContent = prov;
+      select.append(option);
+    });
+    select.value = chinaProvinces[0];
+    renderCityOptions(chinaProvinces[0]);
+  } else {
+    // For non-China countries, province = country
     const option = document.createElement("option");
-    option.value = sub;
-    option.textContent = sub;
+    option.value = country;
+    option.textContent = country;
+    select.append(option);
+    select.value = country;
+    
+    // City = country for non-China
+    const citySelect = $("#citySelect");
+    citySelect.innerHTML = "";
+    const cityOption = document.createElement("option");
+    cityOption.value = country;
+    cityOption.textContent = country;
+    citySelect.append(cityOption);
+  }
+}
+
+function renderCityOptions(province) {
+  const select = $("#citySelect");
+  select.innerHTML = "";
+  const cities = chinaCities[province] || [province];
+  cities.forEach(city => {
+    const option = document.createElement("option");
+    option.value = city;
+    option.textContent = city;
     select.append(option);
   });
 }
 
 function applyRegionCenter(country, options = {}) {
-  const mainRegion = $("#mainRegionSelect") ? $("#mainRegionSelect").value : null;
-  if (state.locationSource === "map" && !options.force) {
-    $("#submitStatus").textContent = "Region updated. Map location preserved.";
-    return;
-  }
-  let center = null;
-  if (mainRegion && regionCoordinates[mainRegion] && regionCoordinates[mainRegion][country]) {
-    center = regionCoordinates[mainRegion][country];
-  }
-  if (!center) return;
-  setDraftLocation(center[0], center[1], "region");
-  if (state.map) state.map.setView(center, Math.max(state.map.getZoom(), 4), { animate: true });
+  // Region center no longer used with new country/province/city system
+  return;
 }
 
 function renderAuth() {
@@ -492,18 +694,22 @@ function wireEvents() {
     window.location.href = "/index-zh.html";
   });
 
-  $("#mainRegionSelect").addEventListener("change", event => {
-    const mainRegion = event.target.value;
-    renderSubRegionOptions(mainRegion);
-    const firstSub = regions[mainRegion] && regions[mainRegion][0];
-    if (firstSub) {
-      $("#provinceSelect").value = firstSub;
-      applyRegionCenter(firstSub, { force: true });
+  $("#countrySelect").addEventListener("change", event => {
+    const country = event.target.value;
+    renderProvinceOptions(country);
+    if (country === "CHINA") {
+      const firstProvince = chinaProvinces[0];
+      renderCityOptions(firstProvince);
+      $("#provinceSelect").value = firstProvince;
     }
   });
 
   $("#provinceSelect").addEventListener("change", event => {
-    applyRegionCenter(event.target.value);
+    const province = event.target.value;
+    const country = $("#countrySelect").value;
+    if (country === "CHINA") {
+      renderCityOptions(province);
+    }
   });
 
   // Set default mood to tender
@@ -523,10 +729,11 @@ function wireEvents() {
         body: JSON.stringify(payload)
       });
       form.reset();
-      $("#mainRegionSelect").value = "North America";
-      renderSubRegionOptions("North America");
-      $("#provinceSelect").value = "USA";
-      applyRegionCenter("USA", { force: true });
+      $("#countrySelect").value = "CHINA";
+      renderProvinceOptions("CHINA");
+      const firstProvince = chinaProvinces[0];
+      renderCityOptions(firstProvince);
+      $("#provinceSelect").value = firstProvince;
       status.textContent = state.user
         ? "Submitted. Check 'My Posts' to track status."
         : "Submitted as guest. Published immediately but cannot be recovered.";
@@ -638,12 +845,8 @@ function wireEvents() {
   });
 }
 
-renderMainRegionOptions();
-renderSubRegionOptions("North America");
+renderCountryOptions();
 initMap();
-$("#mainRegionSelect").value = "North America";
-$("#provinceSelect").value = "USA";
-applyRegionCenter("USA", { force: true });
 wireEvents();
 restoreSession();
 loadPosts();

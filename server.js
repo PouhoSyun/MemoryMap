@@ -12,6 +12,146 @@ const USERS_FILE = path.join(DATA_DIR, "users.json");
 const FEEDBACK_FILE = path.join(DATA_DIR, "feedback.json");
 
 const PORT = Number(process.env.PORT || 4172);
+
+// Load GeoJSON files for reverse geocoding
+let chinaGeoJSON = null;
+let globalGeoJSON = null;
+
+async function loadGeoJSONFiles() {
+  try {
+    const chinaPath = path.join(ROOT, 'city-zh.geojson');
+    const globalPath = path.join(ROOT, 'country-global.geojson');
+    
+    const chinaRaw = await fs.readFile(chinaPath, 'utf8');
+    chinaGeoJSON = JSON.parse(chinaRaw);
+    console.log('China GeoJSON loaded for reverse geocoding');
+    
+    const globalRaw = await fs.readFile(globalPath, 'utf8');
+    globalGeoJSON = JSON.parse(globalRaw);
+    console.log('Global GeoJSON loaded for reverse geocoding');
+  } catch (e) {
+    console.warn('Failed to load GeoJSON files:', e.message);
+  }
+}
+
+// Load Global GeoJSON for country reverse geocoding
+async function loadGlobalGeoJSON() {
+  try {
+    const geoJsonPath = path.join(ROOT, 'country-global.geojson');
+    const raw = await fs.readFile(geoJsonPath, 'utf8');
+    globalGeoJSON = JSON.parse(raw);
+    console.log('Global GeoJSON loaded for country reverse geocoding');
+  } catch (e) {
+    console.warn('Failed to load Global GeoJSON:', e.message);
+  }
+}
+
+// Point-in-polygon test using ray casting algorithm
+function pointInPolygon(point, polygon) {
+  const [x, y] = point;
+  let inside = false;
+  
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+    
+    const intersect = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  
+  return inside;
+}
+
+function getFeatureRings(feature) {
+  if (!feature.geometry) return [];
+  if (feature.geometry.type === "Polygon") return [feature.geometry.coordinates[0]];
+  if (feature.geometry.type === "MultiPolygon") return feature.geometry.coordinates.map(polygon => polygon[0]);
+  return [];
+}
+
+function getLocalizedCountryName(properties = {}, useChinese = false) {
+  const chineseName = normalizeText(properties.FCNAME, 80);
+  const englishName = normalizeText(properties.NAME, 80);
+  return useChinese ? chineseName : (englishName || chineseName);
+}
+
+// Reverse geocode a coordinate - returns { country, province, city }
+// For China: all three fields filled with province/city info (all Chinese)
+// For other countries: country filled with Chinese name, province and city set to country name (all Chinese)
+function reverseGeocodeLocation(lat, lng, useChinese = false) {
+  const point = [lng, lat]; // GeoJSON uses [lng, lat]
+
+  // First try China - 中国优先判定
+  if (chinaGeoJSON && chinaGeoJSON.features) {
+    for (const feature of chinaGeoJSON.features) {
+      for (const coords of getFeatureRings(feature)) {
+        if (pointInPolygon(point, coords)) {
+          return {
+            country: '中国',
+            province: feature.properties.province,
+            city: feature.properties.city,
+            source: 'china'
+          };
+        }
+      }
+    }
+  }
+
+  // Not in China, try global - 国外判定
+  // 中文版本：总是使用 FCNAME（中文国名）
+  // 国外缺少省市数据，用国名填充 province 和 city
+  if (globalGeoJSON && globalGeoJSON.features) {
+    for (const feature of globalGeoJSON.features) {
+      const countryName = getLocalizedCountryName(feature.properties, useChinese);
+      if (!countryName) continue;
+      for (const coords of getFeatureRings(feature)) {
+        if (pointInPolygon(point, coords)) {
+          return {
+            country: countryName,
+            province: countryName,
+            city: countryName,
+            source: 'global'
+          };
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+// Reverse geocode a coordinate to find country (global)
+function reverseGeocodeCountry(lat, lng) {
+  if (!globalGeoJSON || !globalGeoJSON.features) return null;
+  
+  const point = [lng, lat]; // GeoJSON uses [lng, lat]
+  
+  for (const feature of globalGeoJSON.features) {
+    if (!feature.geometry) continue;
+    
+    if (feature.geometry.type === 'Polygon') {
+      const coords = feature.geometry.coordinates[0];
+      if (pointInPolygon(point, coords)) {
+        return {
+          country: feature.properties.NAME,
+          countryZh: feature.properties.FCNAME
+        };
+      }
+    } else if (feature.geometry.type === 'MultiPolygon') {
+      for (const polygon of feature.geometry.coordinates) {
+        const coords = polygon[0];
+        if (pointInPolygon(point, coords)) {
+          return {
+            country: feature.properties.NAME,
+            countryZh: feature.properties.FCNAME
+          };
+        }
+      }
+    }
+  }
+  
+  return null;
+}
 const HOST = process.env.HOST || "0.0.0.0";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "taxtax-admin";
 const ADMIN_USERNAME = "admin";
@@ -25,6 +165,7 @@ const RATE_LIMITS = {
   "/api/auth/login": 5,
   "/api/auth/register": 3,
   "/api/posts": 20,
+  "/api/reverse-geocode": 100,
   "/api/feedback": 10,
   "default": 100
 };
@@ -68,7 +209,9 @@ const seedPosts = [
     body: "那天在北京南站等首班地铁，忽然觉得自己不是在赶路，而是在等一个重新开始的自己。",
     mood: "lonely",
     placeName: "北京南站",
+    country: "中国",
     province: "北京市",
+    city: "北京市",
     lat: 39.8652,
     lng: 116.3785,
     status: "approved",
@@ -81,7 +224,9 @@ const seedPosts = [
     body: "我在武汉江边散步到很晚，想说的话没有发出去。后来风吹过来，我突然不急着被谁理解了。",
     mood: "calm",
     placeName: "武汉江滩",
+    country: "中国",
     province: "湖北省",
+    city: "武汉市",
     lat: 30.5949,
     lng: 114.3055,
     status: "approved",
@@ -94,7 +239,9 @@ const seedPosts = [
     body: "广州的雨很会替人保密。那天我坐在便利店窗边，把难过吃成了一碗热关东煮。",
     mood: "tender",
     placeName: "广州越秀",
+    country: "中国",
     province: "广东省",
+    city: "广州市",
     lat: 23.1291,
     lng: 113.2644,
     status: "approved",
@@ -108,6 +255,8 @@ const seedPosts = [
 async function ensureStore() {
   await fs.mkdir(DATA_DIR, { recursive: true });
   await ensureLogDir();
+  await loadGeoJSONFiles();
+  await loadGlobalGeoJSON();
   try {
     await fs.access(POSTS_FILE);
   } catch {
@@ -362,27 +511,32 @@ function validateCredentials(input, isRegister = false) {
 function validateSubmission(input, user = null) {
   const title = normalizeText(sanitizeInput(input.title), 40);
   const body = normalizeBody(sanitizeInput(input.body));
+  const author = normalizeText(sanitizeInput(input.author || ""), 30);
   const mood = normalizeText(sanitizeInput(input.mood), 24);
   const placeName = normalizeText(sanitizeInput(input.placeName), 60);
-  const province = normalizeText(sanitizeInput(input.province), 40);
+  const country = normalizeText(sanitizeInput(input.country || ""), 40);
+  const province = normalizeText(sanitizeInput(input.province || ""), 40);
+  const city = normalizeText(sanitizeInput(input.city || ""), 40);
   const lat = Number(input.lat);
   const lng = Number(input.lng);
 
-  if (title.length < 2) return { error: "标题至少需要 2 个字。" };
   if (body.length < 8) return { error: "内容至少需要 8 个字。" };
   if (!placeName) return { error: "请写下一个地点名称。" };
-  if (!province) return { error: "请选择省份或地区。" };
+  if (!country) return { error: "请选择国家。" };
   if (!isValidCoordinate(lat, lng)) return { error: "坐标无效，请检查纬度（-90 到 90）和经度（-180 到 180）。" };
   const createdAt = new Date().toISOString();
 
   return {
     value: {
       id: randomUUID(),
-      title,
+      title: title || "Untitled",
       body,
+      author,
       mood: mood || "unspecified",
       placeName,
+      country,
       province,
+      city,
       lat,
       lng,
       userId: user ? user.id : null,
@@ -399,9 +553,12 @@ function publicPost(post) {
     id: post.id,
     title: post.title,
     body: post.body,
+    author: post.author,
     mood: post.mood,
     placeName: post.placeName,
+    country: post.country,
     province: post.province,
+    city: post.city,
     lat: post.lat,
     lng: post.lng,
     createdAt: post.createdAt
@@ -410,7 +567,7 @@ function publicPost(post) {
 
 async function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  const requested = url.pathname === "/" ? "/index.html" : url.pathname;
+  const requested = url.pathname === "/" ? "/index-zh.html" : url.pathname;
   const resolved = path.normalize(path.join(PUBLIC_DIR, requested));
 
   if (!resolved.startsWith(PUBLIC_DIR)) {
@@ -439,6 +596,28 @@ async function handleApi(req, res) {
   if (!checkRateLimit(clientIP, url.pathname)) {
     await logEvent("rate_limit_exceeded", { ip: clientIP, endpoint: url.pathname });
     send(res, 429, { error: "Too many requests. Please try again later." });
+    return;
+  }
+  
+  console.log("API request:", req.method, url.pathname);
+
+  if (req.method === "POST" && url.pathname === "/api/reverse-geocode") {
+    const input = await parseJson(req);
+    const lat = Number(input.lat);
+    const lng = Number(input.lng);
+    const useChinese = input.language === "zh" || input.locale === "zh-CN";
+
+    if (!isValidCoordinate(lat, lng)) {
+      send(res, 400, { error: "Invalid coordinates: out of range" });
+      return;
+    }
+
+    const result = reverseGeocodeLocation(lat, lng, useChinese);
+    if (result) {
+      send(res, 200, { success: true, country: result.country, province: result.province, city: result.city, source: result.source });
+    } else {
+      send(res, 200, { success: false, message: "Location not found" });
+    }
     return;
   }
 
@@ -600,7 +779,6 @@ async function handleApi(req, res) {
     return;
   }
 
-  // 反馈 API
   if (req.method === "POST" && url.pathname === "/api/feedback") {
     const input = await parseJson(req);
 

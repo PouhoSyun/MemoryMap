@@ -61,41 +61,51 @@
           </div>
           <form id="submitForm" class="stack">
             <label>
-              <span>标题</span>
-              <input name="title" maxlength="40" required placeholder="比如：凌晨的天桥" />
+              <span>标题（可选）</span>
+              <input name="title" maxlength="40" placeholder="比如：凌晨的天桥" />
             </label>
             <label>
               <span>内容</span>
               <textarea name="body" maxlength="1200" required placeholder="不需要完整，不需要漂亮，真实就好。"></textarea>
             </label>
+            <label>
+              <span>发布人名字（可选）</span>
+              <input name="author" maxlength="30" placeholder="你的名字或昵称" />
+            </label>
             <div class="field-grid">
               <label>
-                <span>情绪</span>
-                <select name="mood">
-                  <option value="lonely">孤独</option>
-                  <option value="tender">温柔</option>
-                  <option value="calm">平静</option>
-                  <option value="confused">迷茫</option>
-                  <option value="hopeful">希望</option>
-                  <option value="anxious">焦虑</option>
-                  <option value="sad">难过</option>
-                  <option value="angry">愤怒</option>
-                  <option value="grateful">感谢</option>
-                  <option value="missing">想念</option>
-                  <option value="relieved">释然</option>
-                  <option value="tired">疲惫</option>
-                  <option value="secret">秘密</option>
-                </select>
-              </label>
-              <label>
-                <span>大区</span>
-                <select id="mainRegionSelect"></select>
+                <span>国家</span>
+                <select name="country" id="countrySelect" required></select>
               </label>
               <label>
                 <span>省份/地区</span>
-                <select name="province" id="provinceSelect" required></select>
+                <select name="province" id="provinceSelect"></select>
+              </label>
+              <label>
+                <span>城市</span>
+                <select name="city" id="citySelect"></select>
               </label>
             </div>
+            <label class="manual-location-toggle">
+              <input type="checkbox" id="manualLocationToggle" />
+              <span>手动指定地名</span>
+            </label>
+            <p class="microcopy" id="geocodeStatus">点击地图后自动识别国、省、市。</p>
+            <label>
+              <span>情绪</span>
+              <select name="mood">
+                <option value="happy">开心</option>
+                <option value="sad">伤心</option>
+                <option value="lost">失落</option>
+                <option value="angry">愤怒</option>
+                <option value="anxious">焦虑</option>
+                <option value="calm">平静</option>
+                <option value="moved">感动</option>
+                <option value="missing">想念</option>
+                <option value="grateful">感谢</option>
+                <option value="confused">迷茫</option>
+              </select>
+            </label>
             <label>
               <span>地点名称</span>
               <input name="placeName" maxlength="60" required placeholder="城市、街道、学校、车站都可以" />
