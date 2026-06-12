@@ -1,7 +1,0 @@
-{"timestamp":"2026-06-11T14:47:38.775Z","type":"user_registered","username":"Habagat","ip":"2001:250:208:5859:9e1c:620e:697a:424"}
-{"timestamp":"2026-06-11T14:48:44.740Z","type":"user_registered","username":"ziyuxiao","ip":"114.245.35.7"}
-{"timestamp":"2026-06-11T15:45:11.026Z","type":"rate_limit_exceeded","ip":"2603:c024:451c:aa00:0:6c32:5239:8de2","endpoint":"/api/posts"}
-{"timestamp":"2026-06-11T15:45:11.027Z","type":"rate_limit_exceeded","ip":"2603:c024:451c:aa00:0:6c32:5239:8de2","endpoint":"/api/posts"}
-{"timestamp":"2026-06-11T15:45:12.182Z","type":"rate_limit_exceeded","ip":"2603:c024:451c:aa00:0:6c32:5239:8de2","endpoint":"/api/posts"}
-{"timestamp":"2026-06-11T15:45:14.789Z","type":"rate_limit_exceeded","ip":"2603:c024:451c:aa00:0:6c32:5239:8de2","endpoint":"/api/posts"}
-{"timestamp":"2026-06-11T15:45:15.067Z","type":"rate_limit_exceeded","ip":"2603:c024:451c:aa00:0:6c32:5239:8de2","endpoint":"/api/posts"}
