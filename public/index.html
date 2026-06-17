@@ -16,9 +16,19 @@
             <h1>Memory Map</h1>
           </div>
           <div class="top-actions" role="group" aria-label="View actions">
-            <button class="icon-btn" id="openLang" type="button" title="Language" aria-label="Language">
+            <label class="language-picker" title="Language">
               <span aria-hidden="true">🌐</span>
-            </button>
+              <select id="languageSelect" aria-label="Language">
+                <option value="zh-Hans">中文简体</option>
+                <option value="zh-Hant">中文繁体</option>
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+                <option value="bo">བོད་སྐད</option>
+                <option value="ko">한국어</option>
+                <option value="ja">日本語</option>
+                <option value="ii">ꆈꌠꉙ</option>
+              </select>
+            </label>
             <button class="icon-btn" id="openSubmit" type="button" title="Submit" aria-label="Submit">
               <span aria-hidden="true">+</span>
             </button>
@@ -51,12 +61,13 @@
             <h2>Share memories tied to places around the world.</h2>
           </div>
           <div class="filters" id="filters"></div>
+          <button class="secondary-btn wide batch-btn" id="refreshStories" type="button">Shuffle</button>
           <div class="story-list" id="storyList"></div>
         </section>
 
         <section class="tab-panel" id="submitPanel">
           <div class="panel-heading">
-            <p class="eyebrow" id="submitIdentity">Submit as guest / Pending review</p>
+            <p class="eyebrow" id="submitIdentity">Guest submission / Publish immediately</p>
             <h2>Write to a place, write to yourself.</h2>
           </div>
           <form id="submitForm" class="stack">
@@ -73,22 +84,8 @@
               <input name="author" maxlength="30" placeholder="Your name or nickname" />
             </label>
             <label>
-              <span>Mood</span>
-              <select name="mood">
-                <option value="lonely">Lonely</option>
-                <option value="tender">Tender</option>
-                <option value="calm">Calm</option>
-                <option value="confused">Confused</option>
-                <option value="hopeful">Hopeful</option>
-                <option value="anxious">Anxious</option>
-                <option value="sad">Sad</option>
-                <option value="angry">Angry</option>
-                <option value="grateful">Grateful</option>
-                <option value="missing">Missing</option>
-                <option value="relieved">Relieved</option>
-                <option value="tired">Tired</option>
-                <option value="secret">Secret</option>
-              </select>
+              <span>Memory Time</span>
+              <input name="createdAt" type="datetime-local" required />
             </label>
             <div class="field-grid">
               <label>
@@ -104,6 +101,26 @@
                 <select name="city" id="citySelect"></select>
               </label>
             </div>
+            <label class="manual-location-toggle">
+              <input type="checkbox" id="manualLocationToggle" />
+              <span>Enter location name manually</span>
+            </label>
+            <p class="microcopy" id="geocodeStatus">Click the map to auto-detect country, province, and city.</p>
+            <label>
+              <span>Mood</span>
+              <select name="mood">
+                <option value="happy">Happy</option>
+                <option value="sad">Sad</option>
+                <option value="lost">Lost</option>
+                <option value="angry">Angry</option>
+                <option value="anxious">Anxious</option>
+                <option value="calm">Calm</option>
+                <option value="moved">Moved</option>
+                <option value="missing">Missing</option>
+                <option value="grateful">Grateful</option>
+                <option value="confused">Confused</option>
+              </select>
+            </label>
             <label>
               <span>Location Name</span>
               <input name="placeName" maxlength="60" required placeholder="City, street, building, station, etc." />
@@ -118,8 +135,8 @@
                 <input name="lng" id="lngInput" inputmode="decimal" readonly required />
               </label>
             </div>
-            <p class="microcopy">Coordinates must be valid (lat: -90 to 90, lng: -180 to 180). Logged-in submissions can be tracked in "My Posts". Guest submissions are published immediately but cannot be recovered.</p>
-            <button class="primary-btn" type="submit">Submit to Review</button>
+            <p class="microcopy">Submissions can be placed anywhere in the world. Logged-in submissions can be viewed and deleted in "My Posts"; guest submissions publish immediately but cannot be managed later.</p>
+            <button class="primary-btn" type="submit">Publish Now</button>
             <p class="status-line" id="submitStatus"></p>
           </form>
         </section>
@@ -167,7 +184,6 @@
             </div>
             <div class="toolbar">
               <button class="secondary-btn active" data-my-status="all" type="button">All</button>
-              <button class="secondary-btn" data-my-status="pending" type="button">Pending</button>
               <button class="secondary-btn" data-my-status="approved" type="button">Published</button>
               <button class="secondary-btn" data-my-status="rejected" type="button">Rejected</button>
             </div>
@@ -201,6 +217,7 @@
             <p>Memory Map is a global platform for personal emotions, daily moments, secrets, regrets, gratitude, dreams, and farewells—anything that doesn't fit neat categories.</p>
             <p>It's not a crisis hotline or a judgment platform. We maintain minimal moderation: protecting privacy, preventing attacks, rejecting illegal or dangerous content.</p>
             <p>Locations anchor memories to coordinates on the world map. Base map data from OpenStreetMap. Submissions from anywhere on Earth are welcome.</p>
+            <p>Map information comes from OpenStreetMap and related open data. It is used only as geographic reference and does not represent the developer's position on any geography, boundary, administrative division, or political matter.</p>
             <button class="secondary-btn" id="openFeedback" type="button" style="margin-top:12px;">Submit Feedback</button>
           </div>
         </section>

@@ -16,9 +16,19 @@
             <h1>回声树洞</h1>
           </div>
           <div class="top-actions" role="group" aria-label="视图操作">
-            <button class="icon-btn" id="openLang" type="button" title="语言" aria-label="语言">
+            <label class="language-picker" title="语言">
               <span aria-hidden="true">🌐</span>
-            </button>
+              <select id="languageSelect" aria-label="语言">
+                <option value="zh-Hans">中文简体</option>
+                <option value="zh-Hant">中文繁体</option>
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+                <option value="bo">བོད་སྐད</option>
+                <option value="ko">한국어</option>
+                <option value="ja">日本語</option>
+                <option value="ii">ꆈꌠꉙ</option>
+              </select>
+            </label>
             <button class="icon-btn" id="openSubmit" type="button" title="投稿" aria-label="投稿">
               <span aria-hidden="true">+</span>
             </button>
@@ -51,6 +61,7 @@
             <h2>把难以开口的话，放在一个地点上。</h2>
           </div>
           <div class="filters" id="filters"></div>
+          <button class="secondary-btn wide batch-btn" id="refreshStories" type="button">换一批</button>
           <div class="story-list" id="storyList"></div>
         </section>
 
@@ -71,6 +82,10 @@
             <label>
               <span>发布人名字（可选）</span>
               <input name="author" maxlength="30" placeholder="你的名字或昵称" />
+            </label>
+            <label>
+              <span>记忆时间</span>
+              <input name="createdAt" type="datetime-local" required />
             </label>
             <div class="field-grid">
               <label>
@@ -202,6 +217,7 @@
             <p>回声树洞面向个人情感，也允许日常片段、秘密、悔意、感谢、梦、告别和那些不好归类的话。</p>
             <p>它不是求助热线，也不是公开审判场。我们保留最低限度的审核：保护隐私、避免人身攻击、拒绝违法或危险引导。</p>
             <p>地点只用于让记忆有一个可以停靠的坐标。地图底图来自 OpenStreetMap，投稿范围全球有效。</p>
+            <p>地图信息来源于 OpenStreetMap 及相关开放数据，仅用于提供地理参照，不代表开发者对任何地理、边界、行政区划或政治立场的表达。</p>
             <button class="secondary-btn" id="openFeedback" type="button" style="margin-top:12px;">提交反馈</button>
           </div>
         </section>

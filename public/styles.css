@@ -95,6 +95,33 @@ h1 {
   gap: 8px;
 }
 
+.language-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  border: 1px solid rgba(34, 35, 33, 0.14);
+  border-radius: 999px;
+  padding: 0 10px 0 12px;
+  color: var(--ink);
+  background: rgba(255, 253, 248, 0.82);
+  box-shadow: 0 8px 24px rgba(35, 41, 36, 0.1);
+  backdrop-filter: blur(14px);
+}
+
+.language-picker select {
+  width: auto;
+  max-width: 130px;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0 18px 0 0;
+  color: var(--ink);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 650;
+}
+
 .icon-btn {
   width: 42px;
   height: 42px;
@@ -233,6 +260,10 @@ h1 {
   color: white;
   border-color: var(--green);
   background: var(--green);
+}
+
+.batch-btn {
+  margin-bottom: 16px;
 }
 
 .secondary-btn.danger {
