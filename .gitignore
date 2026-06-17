@@ -5,6 +5,7 @@
 data/posts.json
 data/users.json
 data/feedback.json
+data/geocode-cache.json
 data/logs/
 
 # Local logs

@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Memory Map - Global Memory Atlas</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=1.0.1" />
   </head>
   <body>
     <main class="shell">
-      <section class="map-stage" aria-label="Global anonymous memory map">
+      <section class="map-stage" aria-label="Global memory map">
         <div class="topbar">
           <div>
             <p class="kicker">Global Memory Atlas</p>
             <h1>Memory Map</h1>
+            <p class="version-badge">version1.0.1 stable</p>
           </div>
           <div class="top-actions" role="group" aria-label="View actions">
             <label class="language-picker" title="Language">
@@ -57,7 +58,7 @@
 
         <section class="tab-panel active" id="readPanel">
           <div class="panel-heading">
-            <p class="eyebrow">Anonymous Echoes</p>
+            <p class="eyebrow">Echoes</p>
             <h2>Share memories tied to places around the world.</h2>
           </div>
           <div class="filters" id="filters"></div>
@@ -84,8 +85,8 @@
               <input name="author" maxlength="30" placeholder="Your name or nickname" />
             </label>
             <label>
-              <span>Memory Time</span>
-              <input name="createdAt" type="datetime-local" required />
+              <span>Memory Date (optional)</span>
+              <input name="createdAt" type="date" />
             </label>
             <div class="field-grid">
               <label>
@@ -293,6 +294,6 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/app-global.js"></script>
+    <script src="/app-global.js?v=1.0.1"></script>
   </body>
 </html>

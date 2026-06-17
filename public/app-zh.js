@@ -75,9 +75,24 @@ function formatDate(value) {
   return new Intl.DateTimeFormat("zh-CN", {month: "short", day: "numeric", year: "numeric"}).format(new Date(value));
 }
 
-function localDateTimeToIso(value) {
+function todayDateValue() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function dateOnlyToIso(value) {
+  if (!value) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T12:00:00.000Z`;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+function setDefaultMemoryDate() {
+  const input = document.querySelector('input[name="createdAt"]');
+  if (input && !input.value) input.value = todayDateValue();
 }
 
 async function api(path, options = {}) {
@@ -573,7 +588,7 @@ function wireEvents() {
     payload.city = $("#citySelect").value;
     payload.lat = Number(payload.lat);
     payload.lng = Number(payload.lng);
-    payload.createdAt = localDateTimeToIso(payload.createdAt);
+    payload.createdAt = dateOnlyToIso(payload.createdAt || todayDateValue());
     const status = $("#submitStatus");
     status.textContent = "提交中...";
     try {
@@ -588,6 +603,7 @@ function wireEvents() {
       state.geocodeFailed = false;
       state.manualLocation = false;
       $("#manualLocationToggle").checked = false;
+      setDefaultMemoryDate();
       updateLocationControls();
       setGeocodeStatus("点击地图后自动识别国、省、市。");
       status.textContent = state.user ? "已提交。在'我的'中查看状态。" : "已作为游客提交。即时发布但无法恢复。";
@@ -656,6 +672,7 @@ function wireEvents() {
 
 renderCountryOptions();
 updateLocationControls();
+setDefaultMemoryDate();
 initMap();
 wireEvents();
 restoreSession();

@@ -10,17 +10,24 @@ const DATA_DIR = path.join(ROOT, "data");
 const POSTS_FILE = path.join(DATA_DIR, "posts.json");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 const FEEDBACK_FILE = path.join(DATA_DIR, "feedback.json");
+const GEOCODE_CACHE_FILE = path.join(DATA_DIR, "geocode-cache.json");
 const CHINA_GEOJSON_FILE = path.join(ROOT, "city-zh.geojson");
 const GLOBAL_GEOJSON_FILE = path.join(ROOT, "country-global.geojson");
 
 const PORT = Number(process.env.PORT || 4172);
 const GEO_GRID_SIZE = Number(process.env.GEO_GRID_SIZE || 2);
+const GEOCODE_CACHE_PRECISION = Number(process.env.GEOCODE_CACHE_PRECISION || 3);
+const GEOCODE_CACHE_LIMIT = Number(process.env.GEOCODE_CACHE_LIMIT || 50000);
 const CHINA_LOOKUP_BOUNDS = { minLng: 72, minLat: 3, maxLng: 136, maxLat: 54 };
 
 let storeInitialized = false;
 let storeInitPromise = null;
 let chinaGeoIndexPromise = null;
 let globalGeoIndexPromise = null;
+let geocodeCacheInitialized = false;
+let geocodeCacheInitPromise = null;
+let geocodeCacheWriteTimer = null;
+const geocodeCache = new Map();
 
 // Point-in-polygon test using ray casting algorithm
 function pointInPolygon(point, polygon) {
@@ -183,6 +190,65 @@ function warmGeoIndexes() {
     });
 }
 
+function geocodeCacheKey(lat, lng) {
+  return `${Number(lat).toFixed(GEOCODE_CACHE_PRECISION)},${Number(lng).toFixed(GEOCODE_CACHE_PRECISION)}`;
+}
+
+async function ensureGeocodeCache() {
+  if (geocodeCacheInitialized) return;
+  if (!geocodeCacheInitPromise) {
+    geocodeCacheInitPromise = (async () => {
+      try {
+        const raw = await fs.readFile(GEOCODE_CACHE_FILE, "utf8");
+        const parsed = JSON.parse(raw);
+        Object.entries(parsed).forEach(([key, value]) => {
+          if (value && value.source === "china" && value.country && value.province && value.city) {
+            geocodeCache.set(key, value);
+          }
+        });
+      } catch (error) {
+        if (error.code !== "ENOENT") console.warn("Failed to read geocode cache:", error.message);
+      }
+      geocodeCacheInitialized = true;
+    })();
+  }
+  await geocodeCacheInitPromise;
+}
+
+function pruneGeocodeCache() {
+  while (geocodeCache.size > GEOCODE_CACHE_LIMIT) {
+    const oldestKey = geocodeCache.keys().next().value;
+    if (!oldestKey) break;
+    geocodeCache.delete(oldestKey);
+  }
+}
+
+function scheduleGeocodeCacheWrite() {
+  if (geocodeCacheWriteTimer) return;
+  geocodeCacheWriteTimer = setTimeout(async () => {
+    geocodeCacheWriteTimer = null;
+    try {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      pruneGeocodeCache();
+      await fs.writeFile(GEOCODE_CACHE_FILE, JSON.stringify(Object.fromEntries(geocodeCache), null, 2));
+    } catch (error) {
+      console.warn("Failed to write geocode cache:", error.message);
+    }
+  }, 1000);
+}
+
+async function getCachedChinaLocation(lat, lng) {
+  await ensureGeocodeCache();
+  return geocodeCache.get(geocodeCacheKey(lat, lng)) || null;
+}
+
+function cacheChinaLocation(lat, lng, location) {
+  if (!location || location.source !== "china") return;
+  geocodeCache.set(geocodeCacheKey(lat, lng), location);
+  pruneGeocodeCache();
+  scheduleGeocodeCacheWrite();
+}
+
 function getLocalizedCountryName(properties = {}, useChinese = false) {
   const chineseName = normalizeText(properties.FCNAME, 80);
   const englishName = normalizeText(properties.NAME, 80);
@@ -197,9 +263,15 @@ async function reverseGeocodeLocation(lat, lng, useChinese = false) {
 
   // 国内访问更多：坐标落入中国粗略范围时，优先只查中国行政区划索引。
   if (isInsideChinaLookupBounds(point)) {
+    const cachedChinaResult = await getCachedChinaLocation(lat, lng);
+    if (cachedChinaResult) return cachedChinaResult;
+
     const chinaIndex = await loadChinaGeoIndex();
     const chinaResult = findIndexedLocation(chinaIndex, point);
-    if (chinaResult) return chinaResult;
+    if (chinaResult) {
+      cacheChinaLocation(lat, lng, chinaResult);
+      return chinaResult;
+    }
   }
 
   // Not in China, try global - 国外判定
@@ -575,6 +647,17 @@ function normalizeBody(value) {
   return String(value || "").trim().replace(/\r\n/g, "\n").slice(0, 1200);
 }
 
+function todayDateValue() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function dateOnlyToIso(value) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T12:00:00.000Z`;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString();
+}
+
 function isValidCoordinate(lat, lng) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
   // 全球范围：纬度 -90 到 90，经度 -180 到 180
@@ -615,18 +698,16 @@ function validateSubmission(input, user = null) {
   const country = normalizeText(sanitizeInput(input.country || ""), 40);
   const province = normalizeText(sanitizeInput(input.province || ""), 40);
   const city = normalizeText(sanitizeInput(input.city || ""), 40);
-  const createdAtInput = normalizeText(sanitizeInput(input.createdAt || ""), 40);
+  const createdAtInput = normalizeText(sanitizeInput(input.createdAt || ""), 40) || todayDateValue();
   const lat = Number(input.lat);
   const lng = Number(input.lng);
 
   if (body.length < 8) return { error: "内容至少需要 8 个字。" };
   if (!placeName) return { error: "请写下一个地点名称。" };
   if (!country) return { error: "请选择国家。" };
-  if (!createdAtInput) return { error: "请选择记忆时间。" };
   if (!isValidCoordinate(lat, lng)) return { error: "坐标无效，请检查纬度（-90 到 90）和经度（-180 到 180）。" };
-  const createdAtDate = new Date(createdAtInput);
-  if (Number.isNaN(createdAtDate.getTime())) return { error: "记忆时间无效，请重新选择。" };
-  const createdAt = createdAtDate.toISOString();
+  const createdAt = dateOnlyToIso(createdAtInput);
+  if (!createdAt) return { error: "记忆日期无效，请重新选择。" };
   const submittedAt = new Date().toISOString();
 
   return {

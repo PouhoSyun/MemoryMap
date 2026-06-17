@@ -3,17 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>回声树洞 - 全球匿名记忆地图</title>
+    <title>回声树洞 - 全球记忆地图</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=1.0.1" />
   </head>
   <body>
     <main class="shell">
-      <section class="map-stage" aria-label="全球匿名记忆地图">
+      <section class="map-stage" aria-label="全球记忆地图">
         <div class="topbar">
           <div>
             <p class="kicker">全球记忆地图</p>
             <h1>回声树洞</h1>
+            <p class="version-badge">version1.0.1 stable</p>
           </div>
           <div class="top-actions" role="group" aria-label="视图操作">
             <label class="language-picker" title="语言">
@@ -57,7 +58,7 @@
 
         <section class="tab-panel active" id="readPanel">
           <div class="panel-heading">
-            <p class="eyebrow">匿名回声</p>
+            <p class="eyebrow">回声</p>
             <h2>把难以开口的话，放在一个地点上。</h2>
           </div>
           <div class="filters" id="filters"></div>
@@ -84,8 +85,8 @@
               <input name="author" maxlength="30" placeholder="你的名字或昵称" />
             </label>
             <label>
-              <span>记忆时间</span>
-              <input name="createdAt" type="datetime-local" required />
+              <span>记忆日期（可选）</span>
+              <input name="createdAt" type="date" />
             </label>
             <div class="field-grid">
               <label>
@@ -293,6 +294,6 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/app-zh.js"></script>
+    <script src="/app-zh.js?v=1.0.1"></script>
   </body>
 </html>

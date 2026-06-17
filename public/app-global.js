@@ -17,7 +17,7 @@ const languageCopies = {
     mapAria: "OpenStreetMap interactive map",
     hint: "Click on the map to select a location for your memory",
     tabs: ["Read", "Submit", "My Posts", "About"],
-    readEyebrow: "Anonymous Echoes",
+    readEyebrow: "Echoes",
     readTitle: "Share memories tied to places around the world.",
     refresh: "Shuffle",
     submitIdentityGuest: "Guest submission / Publish immediately",
@@ -27,7 +27,7 @@ const languageCopies = {
       title: "Title (optional)",
       content: "Content",
       author: "Author Name (optional)",
-      time: "Memory Time",
+      time: "Memory Date (optional)",
       country: "Country",
       province: "Province/State",
       city: "City",
@@ -120,21 +120,21 @@ languageCopies["zh-Hant"] = {
   ...languageCopies.en,
   htmlLang: "zh-Hant",
   locale: "zh-Hant",
-  title: "回聲樹洞 - 全球匿名記憶地圖",
+  title: "回聲樹洞 - 全球記憶地圖",
   brandKicker: "全球記憶地圖",
   brandTitle: "回聲樹洞",
   actions: { language: "語言", submit: "投稿", about: "關於", mine: "我的" },
   mapAria: "OpenStreetMap 互動地圖",
   hint: "點擊地圖選擇投稿位置",
   tabs: ["閱讀", "投稿", "我的", "說明"],
-  readEyebrow: "匿名回聲",
+  readEyebrow: "回聲",
   readTitle: "把難以開口的話，放在一個地點上。",
   refresh: "換一批",
   submitIdentityGuest: "訪客投稿 / 即時發布",
   submitIdentityUser: username => `${username} - 即時發布`,
   submitTitle: "寫給某個地方，也寫給此刻的自己。",
   labels: {
-    title: "標題（可選）", content: "內容", author: "發布人名字（可選）", time: "記憶時間",
+    title: "標題（可選）", content: "內容", author: "發布人名字（可選）", time: "記憶日期（可選）",
     country: "國家", province: "省份/地區", city: "城市", manualLocation: "手動指定地名",
     mood: "情緒", place: "地點名稱", lat: "緯度", lng: "經度", username: "帳號",
     password: "密碼", createAccount: "註冊帳號", setPassword: "設定密碼",
@@ -195,7 +195,7 @@ languageCopies.ru = {
   ...languageCopies.en,
   htmlLang: "ru",
   locale: "ru-RU",
-  title: "Карта памяти - глобальная анонимная карта",
+  title: "Карта памяти - глобальная карта памяти",
   brandKicker: "Глобальная карта памяти",
   brandTitle: "Карта памяти",
   actions: { language: "Язык", submit: "Опубликовать", about: "О проекте", mine: "Мои записи" },
@@ -208,7 +208,7 @@ languageCopies.ru = {
   submitIdentityUser: username => `${username} - мгновенная публикация`,
   submitTitle: "Напишите месту и себе в этот момент.",
   labels: {
-    title: "Заголовок (необязательно)", content: "Текст", author: "Имя автора (необязательно)", time: "Время воспоминания",
+    title: "Заголовок (необязательно)", content: "Текст", author: "Имя автора (необязательно)", time: "Дата воспоминания (необязательно)",
     country: "Страна", province: "Регион", city: "Город", manualLocation: "Указать место вручную",
     mood: "Настроение", place: "Название места", lat: "Широта", lng: "Долгота", username: "Имя пользователя",
     password: "Пароль", createAccount: "Создать аккаунт", setPassword: "Задать пароль",
@@ -261,20 +261,20 @@ languageCopies.ko = {
   ...languageCopies.en,
   htmlLang: "ko",
   locale: "ko-KR",
-  title: "기억 지도 - 전 세계 익명 기억 지도",
+  title: "기억 지도 - 전 세계 기억 지도",
   brandKicker: "전 세계 기억 지도",
   brandTitle: "기억 지도",
   actions: { language: "언어", submit: "投稿", about: "소개", mine: "내 글" },
   hint: "지도에서 기억을 남길 위치를 선택하세요",
   tabs: ["읽기", "投稿", "내 글", "설명"],
-  readEyebrow: "익명의 메아리",
+  readEyebrow: "메아리",
   readTitle: "말하기 어려운 마음을 한 장소에 놓아두세요.",
   refresh: "다른 글 보기",
   submitIdentityGuest: "게스트 投稿 / 즉시 공개",
   submitIdentityUser: username => `${username} - 즉시 공개`,
   submitTitle: "어떤 장소에게, 그리고 지금의 나에게 씁니다.",
   labels: {
-    title: "제목(선택)", content: "내용", author: "작성자 이름(선택)", time: "기억 시간",
+    title: "제목(선택)", content: "내용", author: "작성자 이름(선택)", time: "기억 날짜(선택)",
     country: "국가", province: "지역", city: "도시", manualLocation: "장소 이름 직접 지정",
     mood: "감정", place: "장소 이름", lat: "위도", lng: "경도", username: "계정",
     password: "비밀번호", createAccount: "계정 만들기", setPassword: "비밀번호 설정",
@@ -327,20 +327,20 @@ languageCopies.ja = {
   ...languageCopies.en,
   htmlLang: "ja",
   locale: "ja-JP",
-  title: "記憶地図 - 世界の匿名記憶マップ",
+  title: "記憶地図 - 世界の記憶マップ",
   brandKicker: "世界の記憶地図",
   brandTitle: "記憶地図",
   actions: { language: "言語", submit: "投稿", about: "概要", mine: "自分の投稿" },
   hint: "地図をクリックして投稿場所を選んでください",
   tabs: ["読む", "投稿", "自分の投稿", "説明"],
-  readEyebrow: "匿名のこだま",
+  readEyebrow: "こだま",
   readTitle: "言葉にしにくい気持ちを、ひとつの場所に置く。",
   refresh: "別の10件",
   submitIdentityGuest: "ゲスト投稿 / 即時公開",
   submitIdentityUser: username => `${username} - 即時公開`,
   submitTitle: "ある場所へ、そして今の自分へ書く。",
   labels: {
-    title: "タイトル（任意）", content: "本文", author: "投稿者名（任意）", time: "記憶の時間",
+    title: "タイトル（任意）", content: "本文", author: "投稿者名（任意）", time: "記憶の日付（任意）",
     country: "国", province: "地域", city: "都市", manualLocation: "地名を手動指定",
     mood: "気持ち", place: "場所名", lat: "緯度", lng: "経度", username: "アカウント",
     password: "パスワード", createAccount: "アカウント作成", setPassword: "パスワード設定",
@@ -406,7 +406,7 @@ languageCopies.bo = {
   submitIdentityUser: username => `${username} - འཕྲལ་དུ་སྤེལ`,
   submitTitle: "ས་གནས་ཤིག་ལ་དང་ད་ལྟའི་རང་ཉིད་ལ་འབྲི།",
   labels: {
-    title: "ཁ་བྱང་།", content: "ནང་དོན", author: "མིང་།", time: "དྲན་པའི་དུས",
+    title: "ཁ་བྱང་།", content: "ནང་དོན", author: "མིང་།", time: "དྲན་པའི་ཚེས།",
     country: "རྒྱལ་ཁབ", province: "ས་ཁུལ", city: "གྲོང་ཁྱེར", manualLocation: "ས་མིང་ལག་ཐོག་འདེམས",
     mood: "ཚོར་བ", place: "ས་མིང", lat: "འཕྲེད་ཐིག", lng: "གཞུང་ཐིག", username: "ཐོ་ཁོངས",
     password: "གསང་ཨང", createAccount: "ཐོ་ཁོངས་གསར", setPassword: "གསང་ཨང་སྒྲིག",
@@ -610,7 +610,7 @@ languageCopies.bo.messages = {
 };
 
 languageCopies.ii.labels = {
-  title: "ꁱꂷ", content: "ꄯꒉꌠ", author: "ꄯꒉꊿ", time: "ꂿꌠꄮꈉ",
+  title: "ꁱꂷ", content: "ꄯꒉꌠ", author: "ꄯꒉꊿ", time: "ꂿꌠꑍꆏ",
   country: "ꇩꏤ", province: "ꁨꈧ", city: "ꏃꃅ", manualLocation: "ꃅꄷꑌꑿ",
   mood: "ꉌꃀ", place: "ꃅꄷꂓ", lat: "ꇗꏢ", lng: "ꈜꏢ", username: "ꀊꏀ",
   password: "ꌤꀦ", createAccount: "ꀊꏀꃅ", setPassword: "ꌤꀦꃅ",
@@ -702,9 +702,24 @@ function formatDate(value) {
   return new Intl.DateTimeFormat("en-US", {month: "short", day: "numeric", year: "numeric"}).format(new Date(value));
 }
 
-function localDateTimeToIso(value) {
+function todayDateValue() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function dateOnlyToIso(value) {
+  if (!value) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T12:00:00.000Z`;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+function setDefaultMemoryDate() {
+  const input = document.querySelector('input[name="createdAt"]');
+  if (input && !input.value) input.value = todayDateValue();
 }
 
 async function api(path, options = {}) {
@@ -1315,7 +1330,7 @@ function wireEvents() {
     payload.city = $("#citySelect").value;
     payload.lat = Number(payload.lat);
     payload.lng = Number(payload.lng);
-    payload.createdAt = localDateTimeToIso(payload.createdAt);
+    payload.createdAt = dateOnlyToIso(payload.createdAt || todayDateValue());
     const status = $("#submitStatus");
     status.textContent = copy.messages.submitLoading;
     try {
@@ -1330,6 +1345,7 @@ function wireEvents() {
       state.geocodeFailed = false;
       state.manualLocation = false;
       $("#manualLocationToggle").checked = false;
+      setDefaultMemoryDate();
       updateLocationControls();
       setGeocodeStatus(copy.geocodeIdle);
       status.textContent = state.user ? copy.messages.submittedUser : copy.messages.submittedGuest;
@@ -1399,6 +1415,7 @@ function wireEvents() {
 applyStaticTranslations();
 renderCountryOptions();
 updateLocationControls();
+setDefaultMemoryDate();
 initMap();
 wireEvents();
 restoreSession();

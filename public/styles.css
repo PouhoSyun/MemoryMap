@@ -90,6 +90,19 @@ h1 {
   font-weight: 760;
 }
 
+.version-badge {
+  display: inline-block;
+  margin: 8px 0 0;
+  padding: 4px 8px;
+  border: 1px solid rgba(34, 35, 33, 0.14);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 253, 248, 0.72);
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
 .top-actions {
   display: flex;
   gap: 8px;
