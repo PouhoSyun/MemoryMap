@@ -2,12 +2,13 @@ module.exports = {
   apps: [{
     name: 'memory-map',
     script: 'server.js',
-    instances: 'max',
-    exec_mode: 'cluster',
+    instances: 1,
+    exec_mode: 'fork',
     env: {
       NODE_ENV: 'production',
       PORT: 4172,
-      HOST: '0.0.0.0'
+      HOST: '0.0.0.0',
+      WARM_GLOBAL_GEO_INDEX: '0'
     },
     error_file: 'logs/err.log',
     out_file: 'logs/out.log',

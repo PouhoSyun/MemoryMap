@@ -180,10 +180,11 @@ function warmGeoIndexes() {
   loadChinaGeoIndex()
     .then(chinaIndex => {
       console.log(`China geo index ready: ${chinaIndex.entries.length} rings`);
-      return loadGlobalGeoIndex();
+      if (process.env.WARM_GLOBAL_GEO_INDEX === "1") return loadGlobalGeoIndex();
+      return null;
     })
     .then(globalIndex => {
-      console.log(`Global geo index ready: ${globalIndex.entries.length} rings`);
+      if (globalIndex) console.log(`Global geo index ready: ${globalIndex.entries.length} rings`);
     })
     .catch(error => {
       console.warn("Geo index warmup failed:", error.message);

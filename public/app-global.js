@@ -1005,7 +1005,7 @@ function initMap() {
     $("#map").innerHTML = `<div class="map-fallback">${escapeHtml(copy.messages.mapFailed)}</div>`;
     return;
   }
-  state.map = L.map("map", {center: [20, 0], zoom: 2, minZoom: 2, maxBounds: [[-85, -180], [85, 180]], maxBoundsViscosity: 0.8, zoomControl: false});
+  state.map = L.map("map", {center: [39.9927, 116.3059], zoom: 16, minZoom: 2, maxBounds: [[-85, -180], [85, 180]], maxBoundsViscosity: 0.8, zoomControl: false});
   document.querySelector("#map").addEventListener("touchmove", event => { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
   L.control.zoom({ position: "bottomleft" }).addTo(state.map);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(state.map);
