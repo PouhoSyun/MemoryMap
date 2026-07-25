@@ -21,4 +21,4 @@ else
   git push origin main
 fi
 
-ssh root@192.3.179.244 'cd /opt/MemoryMap && git pull origin main && systemctl restart memorymap.service && systemctl status memorymap.service --no-pager'
+ssh root@192.3.179.244 'cd /opt/MemoryMap && git pull origin main && if pm2 describe memory-map >/dev/null 2>&1; then pm2 restart memory-map --update-env; else pm2 start ecosystem.config.js; fi && pm2 save && pm2 status && curl -I http://127.0.0.1:4172/'
