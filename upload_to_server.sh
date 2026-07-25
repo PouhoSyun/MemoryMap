@@ -45,5 +45,17 @@ fi
 
 systemctl restart memorymap
 systemctl status memorymap --no-pager
-curl -I http://127.0.0.1:4172/
+
+for attempt in {1..20}; do
+  if curl -fsSI http://127.0.0.1:4172/ >/dev/null; then
+    curl -I http://127.0.0.1:4172/
+    curl -fsS http://127.0.0.1:4172/ | grep -m 1 'version-badge'
+    exit 0
+  fi
+  sleep 1
+done
+
+systemctl status memorymap --no-pager
+journalctl -u memorymap -n 80 --no-pager
+exit 1
 REMOTE_SCRIPT
