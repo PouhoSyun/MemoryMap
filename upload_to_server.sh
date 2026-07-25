@@ -21,4 +21,29 @@ else
   git push origin main
 fi
 
-ssh root@192.3.179.244 'cd /opt/MemoryMap && git pull origin main && if pm2 describe memory-map >/dev/null 2>&1; then pm2 restart memory-map --update-env; else pm2 start ecosystem.config.js; fi && pm2 save && pm2 status && curl -I http://127.0.0.1:4172/'
+ssh root@192.3.179.244 'bash -s' <<'REMOTE_SCRIPT'
+set -euo pipefail
+
+cd /opt/MemoryMap
+git pull origin main
+
+install -m 0644 deploy/memorymap.service /etc/systemd/system/memorymap.service
+systemctl daemon-reload
+systemctl enable memorymap
+
+PM2_BIN=""
+if command -v pm2 >/dev/null 2>&1; then
+  PM2_BIN="$(command -v pm2)"
+elif [[ -x /root/.nvm/versions/node/v24.16.0/bin/pm2 ]]; then
+  PM2_BIN="/root/.nvm/versions/node/v24.16.0/bin/pm2"
+fi
+
+if [[ -n "$PM2_BIN" ]]; then
+  "$PM2_BIN" delete memory-map >/dev/null 2>&1 || true
+  "$PM2_BIN" save >/dev/null 2>&1 || true
+fi
+
+systemctl restart memorymap
+systemctl status memorymap --no-pager
+curl -I http://127.0.0.1:4172/
+REMOTE_SCRIPT
